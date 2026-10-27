@@ -8,7 +8,7 @@ import Footer from './components/Footer';
 export default function App() {
   return (
     <Router>
-      <div className="w-full bg-[#fcfbf9] min-h-screen text-gray-800">
+      <div className="w-full bg-[#F2EFE9] min-h-screen text-gray-800">
         <Navbar />
         <Routes>
           {/* Home Page */}

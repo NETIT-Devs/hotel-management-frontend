@@ -3,11 +3,11 @@ import { Calendar as CalendarIcon, Users, Globe, Sparkles, Tag, ArrowRight, Plus
 
 /**
  * BookingBar Component
+ * Fully responsive hotel search floating bar with interactive popovers.
  * Features:
- * - Perfectly balanced compact promo code input width to avoid excessive stretching
- * - Upward opening dropdowns (bottom-full mb-3) to prevent UI clipping
- * - Reliable HTML5 native Date Picker triggers using showPicker API
- * - Fully responsive mobile & desktop layout with SEO semantic optimization
+ * - Dynamic date inputs with min-date validations
+ * - Fully accessible ARIA attributes for strong SEO compliance
+ * - Clean English code documentation and mobile-first responsive layout
  */
 export default function BookingBar() {
     // Form state management
@@ -33,6 +33,9 @@ export default function BookingBar() {
     const residencyRef = useRef(null);
     const guestRef = useRef(null);
     const experienceRef = useRef(null);
+
+    // Get today's ISO date string to prevent selecting past dates
+    const today = new Date().toISOString().split('T')[0];
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -106,6 +109,7 @@ export default function BookingBar() {
                         }}
                         className="flex items-center gap-3 w-full text-left focus:outline-none cursor-pointer"
                         aria-expanded={isResidencyOpen}
+                        aria-haspopup="listbox"
                     >
                         <Globe className="w-5 h-5 text-[#b8972e] shrink-0" />
                         <div className="flex flex-col w-full">
@@ -119,7 +123,7 @@ export default function BookingBar() {
                     </button>
 
                     {isResidencyOpen && (
-                        <div className="absolute bottom-full left-0 mb-3 w-full min-w-[220px] bg-white p-2 rounded-xl shadow-2xl border border-gray-100 z-50 flex flex-col">
+                        <div className="absolute top-full sm:top-auto sm:bottom-full left-0 mt-2 sm:mt-0 sm:mb-3 w-full min-w-[220px] bg-white p-2 rounded-xl shadow-2xl border border-gray-100 z-50 flex flex-col">
                             <button
                                 type="button"
                                 onClick={() => { setResidency('Non-Resident (USD)'); setIsResidencyOpen(false); }}
@@ -155,6 +159,7 @@ export default function BookingBar() {
                             <input
                                 ref={checkInInputRef}
                                 type="date"
+                                min={today}
                                 value={checkIn}
                                 onChange={(e) => setCheckIn(e.target.value)}
                                 className="absolute inset-0 opacity-0 w-full h-full cursor-pointer pointer-events-auto"
@@ -181,6 +186,7 @@ export default function BookingBar() {
                             <input
                                 ref={checkOutInputRef}
                                 type="date"
+                                min={checkIn || today}
                                 value={checkOut}
                                 onChange={(e) => setCheckOut(e.target.value)}
                                 className="absolute inset-0 opacity-0 w-full h-full cursor-pointer pointer-events-auto"
@@ -201,6 +207,7 @@ export default function BookingBar() {
                         }}
                         className="flex items-center gap-3 w-full text-left focus:outline-none cursor-pointer"
                         aria-expanded={isGuestOpen}
+                        aria-haspopup="dialog"
                     >
                         <Users className="w-5 h-5 text-[#b8972e] shrink-0" />
                         <div className="flex flex-col w-full">
@@ -214,7 +221,7 @@ export default function BookingBar() {
                     </button>
 
                     {isGuestOpen && (
-                        <div className="absolute bottom-full left-0 mb-3 w-64 bg-white p-4 rounded-2xl shadow-2xl border border-gray-100 z-50 flex flex-col gap-4">
+                        <div className="absolute top-full sm:top-auto sm:bottom-full left-0 mt-2 sm:mt-0 sm:mb-3 w-64 bg-white p-4 rounded-2xl shadow-2xl border border-gray-100 z-50 flex flex-col gap-4">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <p className="text-xs font-bold text-gray-800">Adults</p>
@@ -281,6 +288,7 @@ export default function BookingBar() {
                         }}
                         className="flex items-center gap-3 w-full text-left focus:outline-none cursor-pointer"
                         aria-expanded={isExperienceOpen}
+                        aria-haspopup="listbox"
                     >
                         <Sparkles className="w-5 h-5 text-[#b8972e] shrink-0" />
                         <div className="flex flex-col w-full">
@@ -294,7 +302,7 @@ export default function BookingBar() {
                     </button>
 
                     {isExperienceOpen && (
-                        <div className="absolute bottom-full left-0 mb-3 w-full min-w-[240px] bg-white p-2 rounded-xl shadow-2xl border border-gray-100 z-50 flex flex-col">
+                        <div className="absolute top-full sm:top-auto sm:bottom-full left-0 mt-2 sm:mt-0 sm:mb-3 w-full min-w-[240px] bg-white p-2 rounded-xl shadow-2xl border border-gray-100 z-50 flex flex-col">
                             {[
                                 'All Rooms & Suites',
                                 'Honeymoon & Romantic Getaway',
@@ -314,13 +322,13 @@ export default function BookingBar() {
                     )}
                 </div>
 
-                {/* 6. Find Room Submit CTA */}
+                {/* 6. Check Availability Submit CTA */}
                 <div className="p-1">
                     <button
                         type="submit"
                         className="w-full bg-[#b8972e] hover:bg-[#a68525] text-black font-semibold text-xs md:text-sm py-3.5 px-6 rounded-xl md:rounded-2xl transition duration-300 flex items-center justify-center gap-2 shadow-lg cursor-pointer"
                     >
-                        Find Room <ArrowRight className="w-4 h-4" />
+                        Check Availability <ArrowRight className="w-4 h-4" />
                     </button>
                 </div>
 

@@ -6,7 +6,7 @@ import { ROOMS_DATA } from '../constants/hotelData';
 /**
  * Rooms Component (Home Section)
  * Features:
- * - Displays featured rooms and suites in a responsive 3-column grid
+ * - Displays featured rooms and suites in a responsive 3-column grid (Showing first 3 rooms)
  * - Fully responsive layout optimized for mobile, tablet, and desktop views
  * - SEO-friendly semantic markup with lazy-loaded luxury imagery
  * - Integrated navigation link to the dedicated /rooms page
@@ -38,9 +38,9 @@ export default function Rooms() {
                     </button>
                 </div>
 
-                {/* Right Side: 3 Room Cards Grid (Optimized for Mobile & Desktop) */}
+                {/* Right Side: 3 Room Cards Grid (Optimized for Mobile & Desktop - sliced to 3 main rooms) */}
                 <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {ROOMS_DATA.map((room) => (
+                    {ROOMS_DATA.slice(0, 3).map((room) => (
                         <div
                             key={room.id}
                             className="bg-white rounded-2xl overflow-hidden shadow-sm border border-black/5 hover:shadow-md transition duration-300 group flex flex-col justify-between"

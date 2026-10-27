@@ -1,207 +1,246 @@
 import React, { useState } from 'react';
-import { SlidersHorizontal, Phone, ArrowRight, Bed, Users, Maximize2, Waves, Wifi, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Play, Check, SlidersHorizontal, Users, Bed, Wifi, Wind, Waves, Coffee, ArrowRight } from 'lucide-react';
 import { ROOMS_DATA } from '../constants/hotelData';
+import BookingBar from '../components/BookingBar';
+import roomsPageHero from '../assets/roomsPageHero.webp';
 
 /**
  * RoomsPage Component
  * Features:
- * - Luxury 2-column layout (Left: Filter & Sort sidebar, Right: Rooms listing)
- * - 1/6 Image slider functionality for room cards
- * - Responsive design matching the Serenity Bay brand theme (#b8972e and #061C2B)
+ * - Luxury Hero Section with resort background and title
+ * - Integrated BookingBar component
+ * - Advanced Filter & Sort Sidebar (Room Types, Views, Bed Types, Amenities)
+ * - 2-Column Grid displaying all 6 rooms with video walkthrough triggers and image galleries
+ * - Direct navigation to booking checkout flow
  */
 export default function RoomsPage() {
-    const [sortBy, setSortBy] = useState('Recommended');
-    const [priceRange, setPriceRange] = useState(1200);
+    const navigate = useNavigate();
+    
+    // Filter states
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [selectedView, setSelectedView] = useState('All');
+    const [selectedBed, setSelectedBed] = useState('All');
 
-    // State to track image indexes for the 1/6 slider per room
-    const [currentImageIndexes, setCurrentImageIndexes] = useState({});
-
-    const handleNextImage = (roomId, imagesLength, e) => {
-        e.preventDefault();
-        setCurrentImageIndexes(prev => ({
-            ...prev,
-            [roomId]: ((prev[roomId] || 0) + 1) % imagesLength
-        }));
-    };
-
-    const handlePrevImage = (roomId, imagesLength, e) => {
-        e.preventDefault();
-        setCurrentImageIndexes(prev => ({
-            ...prev,
-            [roomId]: ((prev[roomId] || 0) - 1 + imagesLength) % imagesLength
-        }));
-    };
+    // Filter logic based on user selection
+    const filteredRooms = ROOMS_DATA.filter(room => {
+        const matchesCategory = selectedCategory === 'All' || room.category === selectedCategory;
+        const matchesView = selectedView === 'All' || room.view?.includes(selectedView);
+        const matchesBed = selectedBed === 'All' || room.bed?.includes(selectedBed);
+        return matchesCategory && matchesView && matchesBed;
+    });
 
     return (
-        <div className="w-full bg-[#fcfbf9] min-h-screen py-12 px-4 md:px-12">
+        <div className="min-h-screen bg-[#F8F5F0] text-[#061C2B]">
             
-            {/* Header Section */}
-            <div className="max-w-[1350px] mx-auto mb-10">
-                <div className="text-xs text-gray-400 uppercase tracking-widest mb-2">Home &gt; Rooms &amp; Suites</div>
-                <h1 className="font-serif text-3xl md:text-5xl font-light text-[#061C2B] mb-3">Our Rooms &amp; Suites</h1>
-                <p className="text-gray-600 text-sm md:text-base font-light">
-                    Choose from a selection of luxurious rooms and suites, each designed for your comfort and relaxation.
-                </p>
+            {/* Hero Section */}
+            <div className="relative h-[600px] bg-cover bg-center flex flex-col justify-center p-6 pt-20 md:p-12 md:pt-28" style={{ backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${roomsPageHero})` }}>
+                <div className="max-w-7xl mx-auto w-full text-left">
+                    <span className="text-[#C5A253] tracking-[0.2em] uppercase text-xs font-bold block mb-2">
+                        LUXURY STAYS / ROOMS &amp; SUITES
+                    </span>
+                    <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-white font-normal mb-4">
+                        Discover Our<br />
+                        Rooms &amp; Suites
+                    </h1>
+                    <p className="text-gray-200 text-sm md:text-base font-light max-w-xl leading-relaxed">
+                        Elegant spaces, breathtaking views, unforgettable stays.<br />
+                        Your perfect stay awaits.
+                    </p>
+                </div>
+
             </div>
 
-            {/* Main Layout Grid */}
-            <div className="max-w-[1350px] mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* Booking Bar Component Integration */}
+            <div className="w-full max-w-[1350px] mx-auto px-4 -mt-16 relative z-20 mb-16">
+                <BookingBar />
+            </div>
+
+            {/* Main Content: Filter Sidebar & Rooms Grid */}
+            <div className="max-w-7xl mx-auto px-6 md:px-12 pb-24 grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
-                {/* ------------------ LEFT SIDEBAR: FILTER & SORT ------------------ */}
-                <aside className="lg:col-span-1 flex flex-col gap-6">
-                    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col gap-6">
-                        
-                        <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                            <h3 className="font-semibold text-sm text-[#061C2B] flex items-center gap-2">
-                                <SlidersHorizontal className="w-4 h-4 text-[#b8972e]" /> Filter &amp; Sort
-                            </h3>
-                            <button className="text-xs text-[#b8972e] hover:underline cursor-pointer">Clear Filters</button>
+                {/* Left Sidebar: Filter & Sort Controls */}
+                <div className="lg:col-span-3 bg-white p-6 rounded-2xl shadow-sm border border-black/5 h-fit sticky top-28">
+                    <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
+                        <div className="flex items-center gap-2 font-serif text-lg font-medium">
+                            <SlidersHorizontal className="w-4 h-4 text-[#C5A253]" />
+                            <span>Filter &amp; Sort</span>
                         </div>
+                        <button 
+                            onClick={() => { setSelectedCategory('All'); setSelectedView('All'); setSelectedBed('All'); }}
+                            className="text-xs text-gray-500 hover:text-[#C5A253] underline cursor-pointer"
+                        >
+                            Clear All
+                        </button>
+                    </div>
 
-                        {/* Sort By */}
-                        <div className="flex flex-col gap-2">
-                            <label className="text-xs font-semibold uppercase tracking-wider text-gray-500">Sort By</label>
-                            <select 
-                                value={sortBy} 
-                                onChange={(e) => setSortBy(e.target.value)}
-                                className="bg-gray-50 border border-gray-200 text-xs text-gray-800 p-2.5 rounded-xl focus:outline-none focus:border-[#b8972e]"
-                            >
-                                <option>Recommended</option>
-                                <option>Price: Low to High</option>
-                                <option>Price: High to Low</option>
-                            </select>
-                        </div>
-
-                        {/* Room Type */}
-                        <div className="flex flex-col gap-2.5 border-t border-gray-100 pt-4">
-                            <label className="text-xs font-semibold uppercase tracking-wider text-gray-500">Room Type</label>
-                            {['All Rooms (12)', 'Deluxe Rooms (5)', 'Suites (4)', 'Villas (3)'].map((type, idx) => (
-                                <label key={idx} className="flex items-center gap-2.5 text-xs text-gray-700 cursor-pointer">
-                                    <input type="checkbox" defaultChecked={idx === 0} className="rounded border-gray-300 text-[#b8972e] focus:ring-[#b8972e]" />
-                                    {type}
+                    {/* Room Type Filter */}
+                    <div className="mb-6">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Room Type</h4>
+                        <div className="space-y-2 text-sm">
+                            {['All', 'Deluxe Rooms', 'Suites', 'Pool Villas', 'Villas'].map((cat) => (
+                                <label key={cat} className="flex items-center justify-between cursor-pointer py-1">
+                                    <div className="flex items-center gap-2">
+                                        <input 
+                                            type="radio" 
+                                            name="category" 
+                                            checked={selectedCategory === cat} 
+                                            onChange={() => setSelectedCategory(cat)}
+                                            className="accent-[#C5A253]"
+                                        />
+                                        <span className={selectedCategory === cat ? 'font-medium text-[#061C2B]' : 'text-gray-600'}>{cat === 'All' ? 'All Rooms' : cat}</span>
+                                    </div>
+                                    <span className="text-xs text-gray-400">
+                                        {cat === 'All' ? ROOMS_DATA.length : ROOMS_DATA.filter(r => r.category === cat).length}
+                                    </span>
                                 </label>
                             ))}
                         </div>
+                    </div>
 
-                        {/* Price Range */}
-                        <div className="flex flex-col gap-2.5 border-t border-gray-100 pt-4">
-                            <label className="text-xs font-semibold uppercase tracking-wider text-gray-500">Price Range (per night)</label>
-                            <input 
-                                type="range" 
-                                min="150" 
-                                max="1200" 
-                                value={priceRange} 
-                                onChange={(e) => setPriceRange(e.target.value)}
-                                className="w-full accent-[#b8972e] cursor-pointer"
-                            />
-                            <div className="flex justify-between text-xs text-gray-600 font-medium">
-                                <span>$150</span>
-                                <span>${priceRange}+</span>
-                            </div>
+                    {/* View Filter */}
+                    <div className="mb-6">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">View</h4>
+                        <div className="space-y-2 text-sm">
+                            {['All', 'Ocean View', 'Garden View'].map((view) => (
+                                <label key={view} className="flex items-center justify-between cursor-pointer py-1">
+                                    <div className="flex items-center gap-2">
+                                        <input 
+                                            type="radio" 
+                                            name="view" 
+                                            checked={selectedView === view} 
+                                            onChange={() => setSelectedView(view)}
+                                            className="accent-[#C5A253]"
+                                        />
+                                        <span className={selectedView === view ? 'font-medium text-[#061C2B]' : 'text-gray-600'}>{view}</span>
+                                    </div>
+                                </label>
+                            ))}
                         </div>
-
                     </div>
 
-                    {/* Support Card */}
-                    <div className="bg-[#061C2B] text-white p-6 rounded-2xl flex flex-col gap-4 shadow-md relative overflow-hidden">
-                        <h4 className="font-serif text-lg font-light">Need Help?</h4>
-                        <p className="text-gray-300 text-xs font-light leading-relaxed">
-                            Our team is here to assist you in finding the perfect room.
-                        </p>
-                        <a href="tel:+94112345678" className="text-[#b8972e] font-semibold text-sm flex items-center gap-2 hover:underline">
-                            <Phone className="w-4 h-4" /> +94 11 234 5678
-                        </a>
+                    {/* Bed Type Filter */}
+                    <div className="mb-6">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Bed Type</h4>
+                        <div className="space-y-2 text-sm">
+                            {['All', 'King Bed', '2 King Beds'].map((bed) => (
+                                <label key={bed} className="flex items-center justify-between cursor-pointer py-1">
+                                    <div className="flex items-center gap-2">
+                                        <input 
+                                            type="radio" 
+                                            name="bed" 
+                                            checked={selectedBed === bed} 
+                                            onChange={() => setSelectedBed(bed)}
+                                            className="accent-[#C5A253]"
+                                        />
+                                        <span className={selectedBed === bed ? 'font-medium text-[#061C2B]' : 'text-gray-600'}>{bed}</span>
+                                    </div>
+                                </label>
+                            ))}
+                        </div>
                     </div>
-                </aside>
+                </div>
 
-                {/* ------------------ RIGHT SIDE: ROOMS LISTING ------------------ */}
-                <main className="lg:col-span-3 flex flex-col gap-6">
-                    <div className="flex justify-between items-center bg-white px-6 py-4 rounded-2xl border border-gray-100 shadow-sm">
-                        <span className="text-xs font-semibold text-gray-600">Rooms Available</span>
+                {/* Right Side: Rooms Grid (2 Columns Layout with Video & Image Sliders) */}
+                <div className="lg:col-span-9">
+                    
+                    {/* Header info bar */}
+                    <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-black/5">
+                        <div>
+                            <h2 className="font-serif text-2xl font-medium">Find Your Perfect Stay</h2>
+                            <p className="text-xs text-gray-500">Choose from our curated selection of rooms, suites and private villas.</p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <span className="text-xs font-medium bg-[#061C2B] text-white px-3 py-1.5 rounded-lg">
+                                {filteredRooms.length} Rooms Available
+                            </span>
+                        </div>
                     </div>
 
-                    <div className="flex flex-col gap-6">
-                        {ROOMS_DATA.map((room) => {
-                            const imagesList = room.images || [room.image];
-                            const currentIdx = currentImageIndexes[room.id] || 0;
-                            const totalImages = imagesList.length;
-
-                            return (
-                                <div key={room.id} className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden grid grid-cols-1 md:grid-cols-12 gap-0 group hover:shadow-md transition duration-300">
-                                    
-                                    {/* Room Image Slider Section */}
-                                    <div className="md:col-span-5 relative min-h-[240px] md:min-h-full overflow-hidden bg-gray-900">
+                    {/* Room Cards 2-Column Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {filteredRooms.map((room) => (
+                            <div key={room.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-black/5 flex flex-col justify-between group hover:shadow-md transition duration-300">
+                                
+                                <div>
+                                    {/* Main Image with Video Play Icon Overlay */}
+                                    <div className="relative h-60 bg-gray-100 overflow-hidden">
                                         <img 
-                                            src={imagesList[currentIdx]} 
+                                            src={room.images[0]} 
                                             alt={room.title} 
-                                            className="w-full h-full object-cover transition duration-500"
+                                            className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                                         />
                                         
-                                        {/* Navigation Arrows */}
-                                        {totalImages > 1 && (
-                                            <>
-                                                <button 
-                                                    onClick={(e) => handlePrevImage(room.id, totalImages, e)}
-                                                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition cursor-pointer"
-                                                >
-                                                    <ChevronLeft className="w-4 h-4" />
-                                                </button>
-                                                <button 
-                                                    onClick={(e) => handleNextImage(room.id, totalImages, e)}
-                                                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-sm transition cursor-pointer"
-                                                >
-                                                    <ChevronRight className="w-4 h-4" />
-                                                </button>
-                                            </>
-                                        )}
+                                        {/* Video Walkthrough Trigger Button */}
+                                        <button className="absolute top-4 left-4 w-9 h-9 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center hover:bg-[#C5A253] hover:text-black transition shadow-lg">
+                                            <Play className="w-4 h-4 fill-current ml-0.5" />
+                                        </button>
 
-                                        {/* Image Counter Badge */}
-                                        <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md text-white text-xs px-2.5 py-1 rounded-lg">
-                                            {currentIdx + 1} / {totalImages}
-                                        </div>
-                                    </div>
-
-                                    {/* Room Content */}
-                                    <div className="md:col-span-7 p-6 md:p-8 flex flex-col justify-between">
-                                        <div className="flex flex-col gap-3">
-                                            <h3 className="font-serif text-2xl font-normal text-[#061C2B]">{room.title}</h3>
-                                            <p className="text-gray-600 text-xs md:text-sm font-light leading-relaxed">
-                                                {room.description || "A perfect blend of comfort and elegance with stunning views."}
-                                            </p>
-                                            
-                                            <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500 border-t border-b border-gray-100 py-3 my-2">
-                                                <span className="flex items-center gap-1.5"><Bed className="w-4 h-4 text-[#b8972e]" /> {room.bed || 'King Bed'}</span>
-                                                <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-[#b8972e]" /> {room.guests || '2 Guests'}</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center justify-between pt-6 mt-4 border-t border-gray-100">
-                                            <div>
-                                                <span className="text-[10px] uppercase tracking-wider text-gray-400 block">From</span>
-                                                <div className="flex items-baseline gap-1">
-                                                    <span className="font-serif text-2xl font-bold text-[#061C2B]">{room.price}</span>
-                                                    <span className="text-xs text-gray-500">per night</span>
+                                        {/* Gallery Thumbnails Strip at Bottom of Image */}
+                                        <div className="absolute bottom-3 left-3 right-3 flex items-center gap-1.5 overflow-x-auto pb-1">
+                                            {room.images.slice(1, 5).map((img, idx) => (
+                                                <div key={idx} className="w-12 h-8 rounded overflow-hidden border border-white/60 flex-shrink-0">
+                                                    <img src={img} alt="thumb" className="w-full h-full object-cover" />
                                                 </div>
+                                            ))}
+                                            <div className="w-12 h-8 rounded bg-black/60 backdrop-blur-sm border border-white/60 flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0">
+                                                +{room.images.length - 4}
                                             </div>
-                                            
-                                            <button 
-                                                type="button"
-                                                className="bg-[#061C2B] hover:bg-[#b8972e] text-white hover:text-black font-semibold text-xs py-3 px-6 rounded-xl transition duration-300 flex items-center gap-2 cursor-pointer shadow-md"
-                                            >
-                                                Book Now <ArrowRight className="w-4 h-4" />
-                                            </button>
                                         </div>
                                     </div>
 
+                                    {/* Room Information */}
+                                    <div className="p-5">
+                                        <h3 className="font-serif text-xl font-medium mb-1">{room.title}</h3>
+                                        <p className="text-xs text-gray-500 font-light mb-4">{room.description}</p>
+
+                                        {/* Room Specs (Bed, Guests, Size) */}
+                                        <div className="flex flex-wrap items-center gap-4 text-xs text-gray-600 mb-4 font-light pt-3 border-t border-gray-100">
+                                            <span className="flex items-center gap-1">
+                                                <Bed className="w-3.5 h-3.5 text-[#C5A253]" /> {room.bed}
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <Users className="w-3.5 h-3.5 text-[#C5A253]" /> {room.guests}
+                                            </span>
+                                            <span className="flex items-center gap-1">
+                                                <span className="text-[#C5A253] font-bold">📏</span> {room.size}
+                                            </span>
+                                        </div>
+
+                                        {/* Room Amenities */}
+                                        <div className="flex flex-wrap gap-2 mb-2">
+                                            {room.amenities?.map((amenity, index) => (
+                                                <span key={index} className="text-[10px] bg-[#F8F5F0] text-gray-700 px-2.5 py-1 rounded-md border border-gray-200/60 font-light">
+                                                    {amenity}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
-                            );
-                        })}
+
+                                {/* Price and Book Button Section */}
+                                <div className="px-5 pb-5 pt-3 border-t border-gray-100 flex justify-between items-center bg-white">
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-xs text-gray-400 font-light">From</span>
+                                        <span className="font-serif text-xl font-bold text-[#061C2B] mx-1">{room.price}</span>
+                                        <span className="text-xs text-gray-400 font-light">per night</span>
+                                    </div>
+
+                                    <button 
+                                        onClick={() => navigate('/checkout', { state: { room } })}
+                                        className="bg-[#C5A253] text-[#061C2B] px-5 py-2.5 rounded-xl text-xs font-medium hover:bgr-[#b49147] transition flex items-center gap-2 shadow-sm cursor-pointer"
+                                    >
+                                        View Details <ArrowRight className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
+
+                            </div>
+                        ))}
                     </div>
 
-                </main>
+                </div>
 
             </div>
-
         </div>
     );
 }

@@ -13,7 +13,7 @@ export default function Gallery() {
     return (
         <section
             id="gallery"
-            className="w-full bg-[#f7f5f0] py-14 px-6 md:px-12 text-black my-8 overflow-hidden"
+            className="w-full bg-[#F2EFE9] py-14 px-6 md:px-12 text-black my-8 overflow-hidden"
             aria-label="Resort Photo Gallery"
         >
             <div className="max-w-[1500px] mx-auto flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
