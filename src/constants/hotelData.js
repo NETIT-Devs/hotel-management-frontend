@@ -15,6 +15,11 @@ export const NAV_LINKS = [
 ];
 
 // Luxury rooms and suites data with video walkthroughs, gallery images, and package mappings
+// Import local video asset for the Deluxe Ocean Room walkthrough
+import roomVideo1 from '../assets/roomVideo1.mp4';
+import roomVideo2 from '../assets/roomVideo2.mp4';
+
+// Main data array containing all hotel room configurations and media details
 export const ROOMS_DATA = [
     {
         id: 1,
@@ -28,7 +33,7 @@ export const ROOMS_DATA = [
         view: "Ocean View",
         description: "A perfect blend of comfort and elegance with stunning ocean views.",
         amenities: ["Ocean View", "Balcony", "Free Wi-Fi", "Air Conditioning"],
-        videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-luxury-hotel-room-41583-large.mp4",
+        videoUrl: roomVideo1,
         images: [
             "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=800",
             "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&q=80&w=800",
@@ -38,6 +43,7 @@ export const ROOMS_DATA = [
             "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&q=80&w=800"
         ]
     },
+
     {
         id: 2,
         title: "Private Pool Villa",
@@ -47,10 +53,10 @@ export const ROOMS_DATA = [
         bed: "King Bed",
         size: "120 m²",
         price: "$520",
-        view: "Garden & Pool View",
+        view: "Pool View",
         description: "Secluded villa with private infinity pool and lush tropical surroundings.",
-        amenities: ["Private Pool", "Garden View", "Free Wi-Fi", "In-room Dining"],
-        videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-view-of-a-luxury-resort-swimming-pool-41582-large.mp4",
+        amenities: ["Pool View", "Private Pool", "Free Wi-Fi", "In-room Dining"],
+        videoUrl: roomVideo2,
         images: [
             "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=800",
             "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&q=80&w=800",
@@ -60,6 +66,7 @@ export const ROOMS_DATA = [
             "https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&q=80&w=800"
         ]
     },
+
     {
         id: 3,
         title: "Ocean Suite",
@@ -132,7 +139,7 @@ export const ROOMS_DATA = [
         category: "Pool Villas",
         allowedPackage: "Luxury Private Pool Villa",
         guests: "2 Adults",
-        bed: "King Bed",
+        bed: "Twin Bed",
         size: "90 m²",
         price: "$620",
         view: "Ocean View",
