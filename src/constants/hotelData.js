@@ -32,7 +32,7 @@ export const ROOMS_DATA = [
         price: "$280",
         view: "Ocean View",
         description: "A perfect blend of comfort and elegance with stunning ocean views.",
-        amenities: ["Ocean View", "Balcony", "Free Wi-Fi", "Air Conditioning"],
+        amenities: ["Balcony", "Free Wi-Fi", "Air Conditioning"],
         videoUrl: roomVideo1,
         images: [
             "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&q=80&w=800",
@@ -55,7 +55,7 @@ export const ROOMS_DATA = [
         price: "$520",
         view: "Pool View",
         description: "Secluded villa with private infinity pool and lush tropical surroundings.",
-        amenities: ["Pool View", "Private Pool", "Free Wi-Fi", "In-room Dining"],
+        amenities: ["Private Pool", "Free Wi-Fi", "In-room Dining"],
         videoUrl: roomVideo2,
         images: [
             "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=800",
@@ -78,7 +78,7 @@ export const ROOMS_DATA = [
         price: "$680",
         view: "Ocean View",
         description: "Spacious luxury with panoramic ocean views and private lounge space.",
-        amenities: ["Ocean View", "Living Area", "Balcony", "Free Wi-Fi"],
+        amenities: ["Living Area", "Balcony", "Free Wi-Fi"],
         videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-luxury-resort-overwater-bungalows-41584-large.mp4",
         images: [
             "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&q=80&w=800",
@@ -100,7 +100,7 @@ export const ROOMS_DATA = [
         price: "$420",
         view: "Garden View",
         description: "Surrounded by nature, designed for tranquility and restorative peace.",
-        amenities: ["Garden View", "Terrace", "Free Wi-Fi", "Air Conditioning"],
+        amenities: ["Terrace", "Free Wi-Fi", "Air Conditioning"],
         videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-sunlight-entering-a-modern-hotel-room-41585-large.mp4",
         images: [
             "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&q=80&w=800",
@@ -122,7 +122,7 @@ export const ROOMS_DATA = [
         price: "$760",
         view: "Ocean View",
         description: "More space, more moments together with multi-room luxury comfort.",
-        amenities: ["Ocean View", "Free Wi-Fi", "Air Conditioning", "Breakfast Included"],
+        amenities: ["Free Wi-Fi", "Air Conditioning", "Breakfast Included"],
         videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-interior-of-a-luxury-hotel-room-41583-large.mp4",
         images: [
             "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&q=80&w=800",
@@ -144,7 +144,7 @@ export const ROOMS_DATA = [
         price: "$620",
         view: "Ocean View",
         description: "Unforgettable views, exclusive comfort, and breathtaking golden-hour vistas.",
-        amenities: ["Ocean View", "Private Pool", "Free Wi-Fi", "Air Conditioning"],
+        amenities: ["Private Pool", "Free Wi-Fi", "Air Conditioning"],
         videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-luxury-resort-overwater-bungalows-41584-large.mp4",
         images: [
             "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&q=80&w=800",

@@ -23,6 +23,12 @@ const amenityIcons = {
     Terrace: DoorOpen
 };
 
+const viewIcons = {
+    'Ocean View': Waves,
+    'Pool View': Waves,
+    'Garden View': Sparkles
+};
+
 // Extract unique filter options and price bounds from hotel data
 const roomCategories = [...new Set(ROOMS_DATA.map(room => room.category))];
 const roomViews = [...new Set(ROOMS_DATA.map(room => room.view))];
@@ -473,7 +479,7 @@ export default function RoomsPage() {
                                             <p className="text-xs text-gray-500 font-light mb-1">{room.description}</p>
                                             <button
                                                 type="button"
-                                                onClick={() => navigate('/checkout', { state: { room } })}
+                                                onClick={() => navigate('/gallery')}
                                                 className="text-xs font-medium text-[#C5A253] hover:text-[#b49147] transition cursor-pointer"
                                             >
                                                 Read More <span aria-hidden="true">→</span>
@@ -494,7 +500,16 @@ export default function RoomsPage() {
 
                                             {/* Room Amenities Badges with Icons */}
                                             <div className="flex flex-wrap gap-2 mb-2">
-                                                {room.amenities?.map((amenity, index) => {
+                                                {(() => {
+                                                    const ViewIcon = viewIcons[room.view] || Eye;
+                                                    return (
+                                                        <span className="inline-flex items-center gap-1.5 text-[10px] bg-[#F8F5F0] text-gray-700 px-2.5 py-1 rounded-md border border-gray-200/60 font-light">
+                                                            <ViewIcon className="h-3 w-3 text-[#C5A253]" aria-hidden="true" />
+                                                            {room.view}
+                                                        </span>
+                                                    );
+                                                })()}
+                                                {room.amenities?.filter((amenity) => amenity !== room.view).map((amenity, index) => {
                                                     const AmenityIcon = amenityIcons[amenity] || Sparkles;
                                                     return (
                                                         <span key={index} className="inline-flex items-center gap-1.5 text-[10px] bg-[#F8F5F0] text-gray-700 px-2.5 py-1 rounded-md border border-gray-200/60 font-light">
