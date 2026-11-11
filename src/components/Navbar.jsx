@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Calendar, Menu, X } from 'lucide-react';
+import { Search, Calendar, Menu, X, User, LogIn } from 'lucide-react';
 import { NAV_LINKS } from '../constants/hotelData';
 import logoImg from '../assets/logo.png'; // Monogram Logo Asset
 
@@ -10,6 +10,7 @@ import logoImg from '../assets/logo.png'; // Monogram Logo Asset
  * - Dynamic sticky scroll styling with glassmorphism
  * - Full-screen responsive mobile overlay navigation drawer
  * - Complete accessibility (aria-attributes) & SEO structure
+ * - Dynamic Sign-In / Account Authentication Routing
  * - Smart URL routing for Home (/), Rooms (/rooms), and Offers (/offers) pages
  */
 export default function Navbar() {
@@ -18,6 +19,21 @@ export default function Navbar() {
 
     // Scroll state for sticky header background transition
     const [isScrolled, setIsScrolled] = useState(false);
+
+    // User authentication state checked from localStorage
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        // Retrieve stored authentication session data
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                setUser(JSON.parse(storedUser));
+            } catch (e) {
+                console.error("Failed to parse user session", e);
+            }
+        }
+    }, []);
 
     // Event listener to monitor window scroll position
     useEffect(() => {
@@ -105,7 +121,7 @@ export default function Navbar() {
                     })}
                 </div>
 
-                {/* Header Actions (Search Modal Trigger & Primary CTA Button) */}
+                {/* Header Actions (Search Modal, Sign-In Auth Trigger & Primary CTA Button) */}
                 <div className="flex items-center gap-4 text-white">
                     <button
                         type="button"
@@ -115,12 +131,36 @@ export default function Navbar() {
                         <Search className="w-5 h-5" />
                     </button>
 
-                    <button
-                        type="button"
+                    {/* Authentication Sign In / Account Link for Desktop */}
+                    {user ? (
+                        <Link
+                            to="/account"
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                            className="hidden sm:flex items-center gap-2 text-xs font-bold text-[#b8972e] bg-[#061C2B]/80 hover:bg-[#061C2B] px-4 py-2.5 rounded-lg transition border border-[#b8972e]/50 shadow-md focus:outline-none"
+                            aria-label={`Logged in as ${user.full_name || 'User'}`}
+                        >
+                            <User className="w-4 h-4 text-[#b8972e]" />
+                            <span className="truncate max-w-[120px]">{user.full_name || 'Account'}</span>
+                        </Link>
+                    ) : (
+                        <Link
+                            to="/auth"
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                            className="hidden sm:flex items-center gap-2 text-xs font-bold text-white hover:text-[#b8972e] px-4 py-2.5 rounded-lg transition border border-white/30 hover:border-[#b8972e] bg-white/5 backdrop-blur-sm shadow-md focus:outline-none cursor-pointer"
+                            aria-label="Sign In or Create Account"
+                        >
+                            <LogIn className="w-4 h-4 text-[#b8972e]" />
+                            <span>Sign In</span>
+                        </Link>
+                    )}
+
+                    <Link
+                        to="/rooms"
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                         className="hidden sm:flex bg-[#b8972e] text-black px-6 py-2.5 rounded text-sm font-semibold items-center gap-2 hover:bg-[#a68525] transition shadow-lg cursor-pointer"
                     >
                         <Calendar className="w-4 h-4" /> Book Now
-                    </button>
+                    </Link>
 
                     {/* Mobile Navigation Drawer Toggle Icon */}
                     <button
@@ -170,15 +210,46 @@ export default function Navbar() {
                     })}
                 </div>
 
-                {/* Mobile Booking CTA Action */}
-                <div className="w-full mt-auto pt-6">
-                    <button
-                        type="button"
-                        onClick={() => setIsOpen(false)}
+                {/* Mobile Actions: Sign In Link & Booking CTA */}
+                <div className="w-full mt-auto pt-6 flex flex-col gap-3">
+                    {/* Sign In / Account Action for Mobile Overlay */}
+                    {user ? (
+                        <Link
+                            to="/account"
+                            onClick={() => {
+                                setIsOpen(false);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className="w-full bg-white/10 border border-[#b8972e]/50 text-[#b8972e] py-3.5 rounded-xl text-base font-medium flex items-center justify-center gap-2 shadow-md hover:bg-white/15 transition cursor-pointer"
+                        >
+                            <User className="w-5 h-5 text-[#b8972e]" />
+                            <span>My Account ({user.full_name || 'User'})</span>
+                        </Link>
+                    ) : (
+                        <Link
+                            to="/auth"
+                            onClick={() => {
+                                setIsOpen(false);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className="w-full bg-white/10 border border-white/20 text-white py-3.5 rounded-xl text-base font-medium flex items-center justify-center gap-2 shadow-md hover:border-[#b8972e] hover:text-[#b8972e] transition cursor-pointer"
+                        >
+                            <LogIn className="w-5 h-5 text-[#b8972e]" />
+                            <span>Sign In / Register</span>
+                        </Link>
+                    )}
+
+                    {/* Primary Booking CTA Button */}
+                    <Link
+                        to="/rooms"
+                        onClick={() => {
+                            setIsOpen(false);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
                         className="w-full bg-[#b8972e] text-black py-4 rounded-xl text-base font-medium flex items-center justify-center gap-2 shadow-xl hover:bg-[#a68525] transition cursor-pointer"
                     >
                         <Calendar className="w-5 h-5" /> Book Your Stay
-                    </button>
+                    </Link>
                 </div>
             </div>
         </nav>

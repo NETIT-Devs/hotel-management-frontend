@@ -6,6 +6,7 @@ import RoomDetailsPage from './pages/RoomDetailsPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OffersPage from './pages/OffersPage';
 import OfferDetailsPage from './pages/OfferDetailsPage';
+import AuthPage from './pages/AuthPage'; // අලුතෙන් එකතු කළ Sign In / Register Page එක
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
@@ -34,6 +35,9 @@ export default function App() {
 
           {/* Dynamic Offer Details Page Route */}
           <Route path="/offers/:id" element={<OfferDetailsPage />} />
+
+          {/* Authentication (Sign In & Register) Page Route */}
+          <Route path="/auth" element={<AuthPage />} />
         </Routes>
 
         {/* Global Footer */}
