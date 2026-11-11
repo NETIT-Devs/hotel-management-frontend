@@ -22,36 +22,36 @@ export default function Hero() {
                 }}
                 aria-label="Serenity Bay Hotel Hero Section"
             >
-            {/* Hero Main Content Block */}
-            <div className="max-w-4xl mt-auto mb-8 md:mb-10 text-white z-10">
+                {/* Hero Main Content Block with Smooth Fade-In & Slide-Up Animation */}
+                <div className="max-w-4xl mt-auto mb-8 md:mb-10 text-white z-10 animate-[fadeInUp_1s_ease-out]">
 
-                {/* Gold Subtitle Badge */}
-                <span className="text-[#C5A253] tracking-[0.3em] uppercase text-xs font-bold block mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                    WELCOME TO SERENITY BAY
-                </span>
-
-                {/* Primary H1 Heading for SEO & Brand Impact */}
-                <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-light mb-3 leading-tight drop-shadow-lg">
-                    Luxury Redefined<br />by the Ocean
-                </h1>
-
-                {/* Descriptive Tagline */}
-                <p className="text-gray-100 max-w-xl text-sm md:text-base font-light mb-4 leading-relaxed drop-shadow-md">
-                    Experience unparalleled comfort, breathtaking views and world-class hospitality at Serenity Bay Hotel & Resort.
-                </p>
-
-                {/* Brand Story Action Button */}
-                <button
-                    type="button"
-                    className="flex items-center gap-3 text-sm font-medium tracking-wider text-white hover:text-[#C5A253] transition focus:outline-none group cursor-pointer"
-                    aria-label="Watch our brand story video"
-                >
-                    <span className="w-10 h-10 rounded-full border border-white/80 flex items-center justify-center bg-black/40 backdrop-blur-sm group-hover:border-[#C5A253] transition shadow-md">
-                        <Play className="w-4 h-4 fill-current ml-0.5 text-white group-hover:text-[#C5A253] transition" />
+                    {/* Gold Subtitle Badge */}
+                    <span className="text-[#C5A253] tracking-[0.3em] uppercase text-xs font-bold block mb-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                        WELCOME TO SERENITY BAY
                     </span>
-                    Watch Our Story
-                </button>
-            </div>
+
+                    {/* Primary H1 Heading for SEO & Brand Impact */}
+                    <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-light mb-3 leading-tight drop-shadow-lg">
+                        Luxury Redefined<br />by the Ocean
+                    </h1>
+
+                    {/* Descriptive Tagline */}
+                    <p className="text-gray-100 max-w-xl text-sm md:text-base font-light mb-4 leading-relaxed drop-shadow-md">
+                        Experience unparalleled comfort, breathtaking views and world-class hospitality at Serenity Bay Hotel & Resort.
+                    </p>
+
+                    {/* Brand Story Action Button */}
+                    <button
+                        type="button"
+                        className="flex items-center gap-3 text-sm font-medium tracking-wider text-white hover:text-[#C5A253] transition focus:outline-none group cursor-pointer"
+                        aria-label="Watch our brand story video"
+                    >
+                        <span className="w-10 h-10 rounded-full border border-white/80 flex items-center justify-center bg-black/40 backdrop-blur-sm group-hover:border-[#C5A253] transition shadow-md">
+                            <Play className="w-4 h-4 fill-current ml-0.5 text-white group-hover:text-[#C5A253] transition" />
+                        </span>
+                        Watch Our Story
+                    </button>
+                </div>
 
             </section>
 
@@ -59,6 +59,20 @@ export default function Hero() {
             <div className="w-full max-w-[1350px] mx-auto -mt-16 relative z-30 px-4 mb-16">
                 <BookingBar />
             </div>
+
+            {/* Custom keyframes for smooth fade-in-up animation */}
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `}</style>
         </>
     );
 }

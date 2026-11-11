@@ -1,0 +1,417 @@
+import React, { useState } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import {
+    ArrowRight,
+    ChevronRight,
+    ChevronLeft,
+    ShieldCheck,
+    Calendar,
+    Clock,
+    BedDouble,
+    Utensils,
+    Phone,
+    Camera,
+    Check,
+    Sparkles,
+    Award,
+    Clock3
+} from 'lucide-react';
+
+// Centralized Data Import from hotelData.js
+import { OFFERS_DATA as offers } from '../constants/hotelData';
+import BookingBar from '../components/BookingBar';
+
+// Helper function to map text features to icons dynamically
+const getFeatureIcon = (featureTitle) => {
+    const text = typeof featureTitle === 'string' ? featureTitle.toLowerCase() : '';
+    if (text.includes('room') || text.includes('stay') || text.includes('accommodation')) return BedDouble;
+    if (text.includes('breakfast') || text.includes('food') || text.includes('dining')) return Utensils;
+    if (text.includes('checkout') || text.includes('time')) return Clock3;
+    if (text.includes('wifi') || text.includes('internet') || text.includes('advance')) return Calendar;
+    return Award;
+};
+
+function OtherOfferCard({ offer }) {
+    const displayImage = offer.image || (offer.images && offer.images[0]);
+    const navigate = useNavigate();
+
+    return (
+        <article className="group flex flex-col overflow-hidden rounded-3xl border border-[#C9A24B]/40 bg-white transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl shadow-md">
+            <div className="relative h-60 w-full overflow-hidden">
+                <img
+                    src={displayImage}
+                    alt={offer.title}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+                <span className="absolute top-4 right-4 rounded-full bg-[#C9A24B] px-3.5 py-1.5 text-xs font-extrabold text-[#063B32] shadow-lg uppercase tracking-wider">
+                    {offer.discount}
+                </span>
+            </div>
+
+            <div className="flex flex-1 flex-col p-6 text-[#063B32]">
+                <span className="text-[11px] font-bold tracking-[0.2em] text-[#C9A24B] uppercase mb-1">
+                    {offer.category}
+                </span>
+                <h3 className="font-serif text-2xl font-semibold mb-2">{offer.title}</h3>
+                <p className="text-sm text-gray-600 font-light mb-4">{offer.description}</p>
+
+                {offer.originalPrice && offer.discountedPrice && (
+                    <div className="mb-4 bg-[#FAF8F5] p-3 rounded-xl border border-[#C9A24B]/30 flex items-baseline justify-between shadow-inner">
+                        <span className="text-xs text-gray-400 line-through">{offer.originalPrice} / night</span>
+                        <div className="flex items-baseline gap-1">
+                            <span className="text-xs text-gray-600">From</span>
+                            <span className="font-serif text-xl font-bold">{offer.discountedPrice}</span>
+                            <span className="text-xs text-gray-600">/ night</span>
+                        </div>
+                    </div>
+                )}
+
+                <div className="pt-2 flex items-center justify-between mt-auto">
+                    <Link
+                        to={`/offers/${offer.id}`}
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        className="text-xs font-bold tracking-wider text-[#C9A24B] hover:text-[#B38E38] inline-flex items-center gap-1.5"
+                    >
+                        <span>Read More</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            navigate('/checkout', { state: { room: offer } });
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="bg-gradient-to-r from-[#C9A24B] to-[#B38E38] text-[#063B32] px-4 py-2.5 rounded-xl text-xs font-bold tracking-wider hover:opacity-95 shadow-md flex items-center gap-1.5 cursor-pointer"
+                    >
+                        <span>Book Now</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-[#063B32]" />
+                    </button>
+                </div>
+            </div>
+        </article>
+    );
+}
+
+export default function OfferDetailsPage() {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const offer = offers.find((item) => String(item.id) === String(id));
+    const otherOffers = offers.filter((item) => String(item.id) !== String(id));
+
+    // Image slider state for the main offer image gallery
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+    if (!offer) {
+        return (
+            <main className="min-h-[50vh] bg-[#F8F5F0] px-5 py-24 text-center">
+                <h1 className="font-serif text-3xl text-[#063B32]">Offer Not Found</h1>
+                <p className="mt-4 text-sm text-gray-600">This offer may no longer be available.</p>
+                <Link
+                    to="/offers"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="mt-6 inline-flex items-center gap-2 bg-[#063B32] px-6 py-3 text-sm text-white rounded-xl"
+                >
+                    View All Offers <ArrowRight className="h-4 w-4" />
+                </Link>
+            </main>
+        );
+    }
+
+    // Handle image list (support single image string or images array)
+    const imageList = offer.images && offer.images.length > 0
+        ? offer.images
+        : [offer.image || 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1400&q=85'];
+
+    const handlePrevImage = () => {
+        setActiveImageIndex((prev) => (prev === 0 ? imageList.length - 1 : prev - 1));
+    };
+
+    const handleNextImage = () => {
+        setActiveImageIndex((prev) => (prev === imageList.length - 1 ? 0 : prev + 1));
+    };
+
+    return (
+        <main className="min-h-screen bg-[#F8F5F0] text-[#063B32] overflow-x-hidden">
+            {/* ================= HERO SECTION ================= */}
+            <header
+                className="relative h-[450px] md:h-[600px] bg-cover bg-center flex flex-col justify-center px-6 pt-20 md:px-12 md:pt-28"
+                style={{
+                    backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${imageList[0]})`
+                }}
+                role="banner"
+                aria-label="Offer details header"
+            >
+                {/* Hero Content with Smooth Fade-In & Slide-Up Animation */}
+                <div className="max-w-7xl mx-auto w-full text-left animate-[fadeInUp_1s_ease-out]">
+                    <Link
+                        to="/offers"
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        className="inline-flex items-center gap-2 text-xs font-bold tracking-widest text-white hover:text-[#C9A24B] transition-colors mb-4 uppercase cursor-pointer"
+                    >
+                        <ArrowRight className="w-4 h-4 rotate-180" />
+                        <span>Back to Offers</span>
+                    </Link>
+                    <span className="text-[#C9A24B] tracking-[0.25em] uppercase text-xs font-bold block mb-2">
+                        EXCLUSIVE OFFERS / {offer.category}
+                    </span>
+                    <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-normal mb-3 md:mb-4">
+                        {offer.title}
+                    </h1>
+                    <p className="text-gray-200 text-xs sm:text-sm md:text-base font-light max-w-xl leading-relaxed">
+                        {offer.subtitle || 'Create unforgettable moments together at Serenity Bay Resort.'}
+                    </p>
+                </div>
+            </header>
+
+            {/* Booking Bar Component Integration */}
+            <div className="w-full max-w-[1350px] mx-auto px-4 -mt-10 md:-mt-14 relative z-20 mb-12">
+                <BookingBar />
+            </div>
+
+            {/* ================= MAIN CONTENT SECTION (Optimized Grid: Span 5 for Gallery, Span 5 for Details, Span 2 for Sticky Booking) ================= */}
+            <section className="max-w-[1440px] mx-auto px-5 md:px-12 py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                    {/* Left Column: Image Gallery (Span 5 - Perfect large image size) */}
+                    <div className="lg:col-span-5 space-y-4">
+                        <div className="relative h-[330px] sm:h-[400px] rounded-3xl overflow-hidden bg-gray-100 shadow-md">
+                            <img
+                                src={imageList[activeImageIndex]}
+                                alt={`${offer.title} view ${activeImageIndex + 1}`}
+                                className="w-full h-full object-cover transition-all duration-500"
+                            />
+                            <div className="absolute bottom-4 left-4 bg-black/60 backdrop-blur-md text-white px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-2">
+                                <Camera className="w-3.5 h-3.5 text-[#C9A24B]" />
+                                <span>{activeImageIndex + 1} / {imageList.length}</span>
+                            </div>
+
+                            {imageList.length > 1 && (
+                                <>
+                                    <button
+                                        type="button"
+                                        onClick={handlePrevImage}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#061C2B]/60 hover:bg-[#061C2B] text-white flex items-center justify-center transition-all opacity-80 hover:opacity-100 shadow-md cursor-pointer"
+                                        aria-label="Previous image"
+                                    >
+                                        <ChevronLeft className="w-5 h-5" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleNextImage}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#061C2B]/60 hover:bg-[#061C2B] text-white flex items-center justify-center transition-all opacity-80 hover:opacity-100 shadow-md cursor-pointer"
+                                        aria-label="Next image"
+                                    >
+                                        <ChevronRight className="w-5 h-5" />
+                                    </button>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Thumbnails Grid */}
+                        {imageList.length > 1 && (
+                            <div className="grid gap-2.5" style={{ gridTemplateColumns: `repeat(${imageList.length}, minmax(0, 1fr))` }}>
+                                {imageList.map((img, idx) => (
+                                    <button
+                                        key={idx}
+                                        type="button"
+                                        onClick={() => setActiveImageIndex(idx)}
+                                        className={`h-16 sm:h-20 rounded-2xl overflow-hidden border-2 cursor-pointer transition shadow-xs ${activeImageIndex === idx ? 'border-[#C9A24B] scale-105 shadow-md' : 'border-transparent opacity-70 hover:opacity-100'}`}
+                                    >
+                                        <img src={img} alt="thumb" className="w-full h-full object-cover" />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Middle Column: Title, Description, Pricing & Highlights (Span 4) */}
+                    <div className="lg:col-span-4 space-y-6">
+                        <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+                            {/* Subtle background golden aura */}
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#C9A24B]/5 rounded-full blur-2xl pointer-events-none"></div>
+
+                            {/* Category & Discount Badges */}
+                            <div className="flex items-center justify-between mb-4">
+                                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#C9A24B]/15 px-3.5 py-1 text-[11px] font-bold text-[#063B32] border border-[#C9A24B]/40 uppercase tracking-wider">
+                                    <Sparkles className="w-3 h-3 text-[#C9A24B]" /> {offer.category}
+                                </span>
+                                <span className="rounded-full bg-[#C9A24B] px-3.5 py-1 text-xs font-extrabold text-[#063B32] shadow-sm uppercase tracking-wider">
+                                    {offer.discount}
+                                </span>
+                            </div>
+
+                            {/* Title */}
+                            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-[#063B32] mb-3">
+                                {offer.title}
+                            </h2>
+
+                            {/* Description */}
+                            <p className="text-xs sm:text-sm text-gray-600 font-light leading-relaxed mb-6">
+                                {offer.description} Indulge in a luxurious getaway at Serenity Bay. Enjoy a perfect blend of comfort, elegance and breathtaking ocean views, designed for your special moments.
+                            </p>
+
+                            {/* Redesigned Premium Pricing Box matching Golden Theme */}
+                            {offer.originalPrice && offer.discountedPrice && (
+                                <div className="bg-gradient-to-r from-[#FAF8F5] to-white p-4 sm:p-5 rounded-2xl border border-[#C9A24B]/35 mb-6 shadow-md relative overflow-hidden">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-xs text-gray-400 font-light line-through">
+                                            {offer.originalPrice} / night
+                                        </span>
+                                        {offer.saveAmount && (
+                                            <span className="rounded-lg bg-[#C9A24B]/15 text-[#C9A24B] px-2.5 py-0.5 text-[10px] font-extrabold tracking-wider uppercase shadow-xs">
+                                                {offer.saveAmount}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="flex items-baseline justify-between pt-2 border-t border-[#C9A24B]/20">
+                                        <span className="text-xs text-[#063B32] font-bold tracking-wider uppercase">Special Rate</span>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-xs text-gray-600">From</span>
+                                            <span className="font-serif text-2xl sm:text-3xl font-bold text-[#061C2B]">{offer.discountedPrice}</span>
+                                            <span className="text-xs text-gray-600">/ night</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Offer Highlights - Added spacing above the heading */}
+                            {offer.features && offer.features.length > 0 && (
+                                <div className="border-t border-[#C9A24B]/20 pt-5 mt-6">
+                                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-[#061C2B] mb-4">
+                                        Offer Highlights
+                                    </h3>
+                                    <div className="flex flex-wrap justify-center gap-2.5">
+                                        {offer.features.map((feature, idx) => {
+                                            const featureTitle = typeof feature === 'string' ? feature : feature.title;
+                                            const IconComp = getFeatureIcon(featureTitle);
+                                            return (
+                                                <div
+                                                    key={idx}
+                                                    className="flex flex-col items-center justify-between text-center p-3 rounded-2xl bg-[#FAF8F5] border border-[#C9A24B]/30 w-[30%] min-w-[95px] flex-grow transition-all duration-300 hover:border-[#C9A24B] hover:shadow-sm"
+                                                >
+                                                    <div className="w-8 h-8 rounded-full bg-[#C9A24B]/15 flex items-center justify-center text-[#C9A24B] mb-2 flex-shrink-0">
+                                                        <IconComp className="w-4 h-4 text-[#C9A24B]" />
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-[#063B32] leading-tight">{featureTitle}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                        </div>
+                    </div>
+
+                    {/* Right Column: Sticky Booking & Support Card (Span 3) */}
+                    <div className="lg:col-span-3 space-y-6">
+                        <div className="bg-[#063B32] text-white rounded-3xl p-6 sm:p-7 shadow-xl border border-[#C9A24B]/40 sticky top-28 overflow-hidden relative">
+                            {/* Subtle background decoration */}
+                            <div className="absolute inset-0 opacity-10 bg-cover bg-center pointer-events-none"></div>
+
+                            {/* Limited Time Offer Header */}
+                            <div className="flex flex-col items-center text-center mb-6 pb-6 border-b border-[#C9A24B]/30">
+                                <div className="w-11 h-11 rounded-2xl bg-[#C9A24B]/20 flex items-center justify-center text-[#C9A24B] mb-3 shadow-sm">
+                                    <Clock className="w-5 h-5 text-[#C9A24B]" />
+                                </div>
+                                <span className="text-[10px] uppercase tracking-[0.25em] text-[#C9A24B] font-extrabold block mb-2">
+                                    Limited Time Offer
+                                </span>
+                                <span className="text-xs text-gray-300 font-light block mb-1">Valid until</span>
+                                <div className="flex items-center gap-2 text-white font-serif text-base font-semibold">
+                                    <Calendar className="w-4 h-4 text-[#C9A24B]" />
+                                    <span>{offer.validUntil || 'Dec 31, 2026'}</span>
+                                </div>
+                            </div>
+
+                            {/* Book Offer Button */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    navigate('/checkout', { state: { room: offer } });
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
+                                className="w-full bg-gradient-to-r from-[#C9A24B] via-[#D4AF37] to-[#C9A24B] text-[#063B32] py-3.5 px-4 rounded-2xl text-xs font-black tracking-widest uppercase hover:opacity-95 transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer mb-6"
+                            >
+                                <span>Book Offer</span>
+                                <ArrowRight className="w-4 h-4 text-[#063B32]" />
+                            </button>
+
+                            {/* Need Help Section */}
+                            <div className="text-center pt-2">
+                                <span className="text-xs text-gray-300 font-light block mb-2">Need Help?</span>
+                                <a
+                                    href="tel:+94112345678"
+                                    className="font-serif text-sm font-bold text-white hover:text-[#C9A24B] transition-colors inline-flex items-center justify-center gap-1.5 mb-2 whitespace-nowrap"
+                                >
+                                    <div className="w-6 h-6 rounded-lg bg-[#C9A24B]/20 flex items-center justify-center text-[#C9A24B] shrink-0">
+                                        <Phone className="w-3.5 h-3.5 text-[#C9A24B]" />
+                                    </div>
+                                    <span>+94 11 234 5678</span>
+                                </a>
+                                <p className="text-[10px] text-gray-400 font-light mt-1">24/7 Assistance</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                {/* Terms & Conditions Section */}
+                {offer.terms && offer.terms.length > 0 && (
+                    <div className="max-w-[1440px] mx-auto mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-[#C9A24B]/30">
+                        <h3 className="font-serif text-xl font-medium text-[#063B32] mb-5 flex items-center gap-2">
+                            <span>Terms &amp; Conditions</span>
+                            <span className="h-[1px] flex-1 bg-[#C9A24B]/30 ml-4"></span>
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs sm:text-sm text-gray-600">
+                            {offer.terms.map((term, idx) => (
+                                <div key={idx} className="flex items-start gap-2.5">
+                                    <div className="w-4 h-4 rounded-full bg-[#C9A24B]/20 flex items-center justify-center shrink-0 mt-0.5">
+                                        <Check className="w-2.5 h-2.5 text-[#C9A24B]" />
+                                    </div>
+                                    <span className="font-light leading-relaxed">{term}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </section>
+
+            {/* ================= OTHER OFFERS SECTION ================= */}
+            <section className="max-w-7xl mx-auto px-5 md:px-8 py-16 border-t border-[#C9A24B]/30 mt-12">
+                <div className="text-center max-w-2xl mx-auto mb-10">
+                    <span className="text-xs font-bold uppercase tracking-[0.25em] text-[#C5A253] block mb-2">
+                        DISCOVER MORE
+                    </span>
+                    <h2 className="font-serif text-3xl md:text-4xl text-[#063B32] font-normal mb-3">
+                        Other Offers
+                    </h2>
+                    <p className="text-sm text-gray-600 font-light">
+                        Explore our other special packages for your next getaway.
+                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                    {otherOffers.map((item) => (
+                        <OtherOfferCard key={item.id} offer={item} />
+                    ))}
+                </div>
+            </section>
+
+            {/* Custom keyframes for smooth fade-in-up animation */}
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `}</style>
+        </main>
+    );
+}

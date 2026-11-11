@@ -120,12 +120,12 @@ export default function RoomsPage() {
                 <p>Explore luxury accommodation at Serenity Bay Resort. Book ocean-view suites, garden villas, and premium rooms with best rate guarantees.</p>
             </div>
 
-            {/* Hero Section */}
+            {/* Hero Section with Smooth Fade-In & Slide-Up Animation */}
             <div
                 className="relative h-[450px] md:h-[600px] bg-cover bg-center flex flex-col justify-center px-6 pt-20 md:px-12 md:pt-28"
                 style={{ backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${roomsPageHero})` }}
             >
-                <div className="max-w-7xl mx-auto w-full text-left">
+                <div className="max-w-7xl mx-auto w-full text-left animate-[fadeInUp_1s_ease-out]">
                     <span className="text-[#C5A253] tracking-[0.2em] uppercase text-xs font-bold block mb-2">
                         LUXURY STAYS / ROOMS &amp; SUITES
                     </span>
@@ -353,7 +353,7 @@ export default function RoomsPage() {
                     />
                 )}
 
-                {/* Right Side: Rooms Grid / List Container */}
+                {/* ================= ROOMS LISTING SECTION ================= */}
                 <div id="room-listings" className="lg:col-span-9 w-full">
 
                     {/* Rooms Listing Header & Sorting Controls */}
@@ -430,7 +430,7 @@ export default function RoomsPage() {
                             const currentMainImg = room.images?.[activeImgIdx] || room.images[0];
 
                             return (
-                                <article key={room.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-black/5 flex flex-col justify-between group hover:shadow-md transition duration-300">
+                                <article key={room.id} className="bg-white rounded-3xl overflow-hidden shadow-md border border-[#C5A253]/30 flex flex-col justify-between group hover:-translate-y-1.5 hover:shadow-2xl transition-all duration-300">
 
                                     <div>
                                         {/* Main Room Image with Video Walkthrough Trigger & Gallery Thumbnails */}
@@ -438,7 +438,7 @@ export default function RoomsPage() {
                                             <img
                                                 src={currentMainImg}
                                                 alt={room.title}
-                                                className="w-full h-full object-cover transition duration-500"
+                                                className="w-full h-full object-cover transition duration-700 group-hover:scale-105"
                                                 loading="lazy"
                                             />
 
@@ -474,37 +474,45 @@ export default function RoomsPage() {
                                         </div>
 
                                         {/* Room Information & Description */}
-                                        <div className="p-5">
-                                            <h3 className="font-serif text-xl font-medium mb-1">{room.title}</h3>
-                                            <p className="text-xs text-gray-500 font-light mb-1">{room.description}</p>
-                                            <button
-                                                type="button"
-                                                onClick={() => navigate('/gallery')}
-                                                className="text-xs font-medium text-[#C5A253] hover:text-[#b49147] transition cursor-pointer"
-                                            >
-                                                Read More <span aria-hidden="true">→</span>
-                                            </button>
+                                        <div className="p-6 md:p-7 text-[#061C2B]">
+                                            <h3 className="font-serif text-2xl font-semibold mb-2 text-[#061C2B] tracking-wide">{room.title}</h3>
+                                            <p className="text-sm text-gray-600 font-light leading-relaxed mb-4">{room.description}</p>
+
+                                            {/* Read More Link */}
+                                            <div className="mb-5">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        navigate(`/rooms/${room.id}`);
+                                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                    }}
+                                                    className="text-xs font-bold tracking-wider text-[#C5A253] hover:text-[#b49147] transition-colors cursor-pointer flex items-center gap-1.5"
+                                                >
+                                                    <span>Read More</span>
+                                                    <ArrowRight className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
 
                                             {/* Room Specifications with Icons */}
-                                            <div className="flex flex-wrap items-center gap-4 text-xs text-gray-600 mb-4 font-light pt-3 border-t border-gray-100">
+                                            <div className="flex flex-wrap items-center gap-4 text-xs text-gray-700 mb-4 font-normal pt-4 border-t border-[#C5A253]/20">
                                                 <span className="flex items-center gap-1.5">
-                                                    <Bed className="w-3.5 h-3.5 text-[#C5A253]" /> {room.bed}
+                                                    <Bed className="w-4 h-4 text-[#C5A253]" /> {room.bed}
                                                 </span>
                                                 <span className="flex items-center gap-1.5">
-                                                    <Users className="w-3.5 h-3.5 text-[#C5A253]" /> {room.guests}
+                                                    <Users className="w-4 h-4 text-[#C5A253]" /> {room.guests}
                                                 </span>
                                                 <span className="flex items-center gap-1.5">
-                                                    <Maximize2 className="w-3.5 h-3.5 text-[#C5A253]" /> {room.size}
+                                                    <Maximize2 className="w-4 h-4 text-[#C5A253]" /> {room.size}
                                                 </span>
                                             </div>
 
                                             {/* Room Amenities Badges with Icons */}
-                                            <div className="flex flex-wrap gap-2 mb-2">
+                                            <div className="flex flex-wrap gap-2">
                                                 {(() => {
                                                     const ViewIcon = viewIcons[room.view] || Eye;
                                                     return (
-                                                        <span className="inline-flex items-center gap-1.5 text-[10px] bg-[#F8F5F0] text-gray-700 px-2.5 py-1 rounded-md border border-gray-200/60 font-light">
-                                                            <ViewIcon className="h-3 w-3 text-[#C5A253]" aria-hidden="true" />
+                                                        <span className="inline-flex items-center gap-1.5 text-[11px] bg-[#FAF8F5] text-[#061C2B] px-3 py-1.5 rounded-lg border border-[#C5A253]/30 font-medium shadow-2xs">
+                                                            <ViewIcon className="h-3.5 w-3.5 text-[#C5A253]" aria-hidden="true" />
                                                             {room.view}
                                                         </span>
                                                     );
@@ -512,8 +520,8 @@ export default function RoomsPage() {
                                                 {room.amenities?.filter((amenity) => amenity !== room.view).map((amenity, index) => {
                                                     const AmenityIcon = amenityIcons[amenity] || Sparkles;
                                                     return (
-                                                        <span key={index} className="inline-flex items-center gap-1.5 text-[10px] bg-[#F8F5F0] text-gray-700 px-2.5 py-1 rounded-md border border-gray-200/60 font-light">
-                                                            <AmenityIcon className="h-3 w-3 text-[#C5A253]" aria-hidden="true" />
+                                                        <span key={index} className="inline-flex items-center gap-1.5 text-[11px] bg-[#FAF8F5] text-[#061C2B] px-3 py-1.5 rounded-lg border border-[#C5A253]/30 font-medium shadow-2xs">
+                                                            <AmenityIcon className="h-3.5 w-3.5 text-[#C5A253]" aria-hidden="true" />
                                                             {amenity}
                                                         </span>
                                                     );
@@ -523,19 +531,23 @@ export default function RoomsPage() {
                                     </div>
 
                                     {/* Pricing and Booking Action Footer */}
-                                    <div className="px-5 pb-5 pt-3 border-t border-gray-100 flex justify-between items-center bg-white">
-                                        <div className="flex items-baseline gap-1">
-                                            <span className="text-xs text-gray-400 font-light">From</span>
-                                            <span className="font-serif text-xl font-bold text-[#061C2B] mx-1">{room.price}</span>
-                                            <span className="text-xs text-gray-400 font-light">per night</span>
+                                    <div className="px-6 py-5 border-t border-[#C5A253]/20 flex justify-between items-center bg-[#FAF8F5]">
+                                        <div className="flex items-baseline gap-1.5">
+                                            <span className="text-xs text-gray-600 font-medium">From</span>
+                                            <span className="font-serif text-2xl font-bold text-[#061C2B]">{room.price}</span>
+                                            <span className="text-xs text-gray-600 font-medium">/ night</span>
                                         </div>
 
+                                        {/* Navigate to checkout page with smooth scroll to top */}
                                         <button
                                             type="button"
-                                            onClick={() => navigate('/checkout', { state: { room } })}
-                                            className="bg-[#C5A253] text-[#061C2B] px-5 py-2.5 rounded-xl text-xs font-medium hover:bg-[#b49147] transition flex items-center gap-2 shadow-sm cursor-pointer"
+                                            onClick={() => {
+                                                navigate('/checkout', { state: { room } });
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }}
+                                            className="bg-gradient-to-r from-[#C5A253] to-[#b49147] text-[#061C2B] px-5 py-3 rounded-xl text-xs font-bold tracking-wider hover:opacity-95 transition-all shadow-md flex items-center gap-2 cursor-pointer"
                                         >
-                                            Book Now <ArrowRight className="w-3.5 h-3.5" />
+                                            <span>Book Now</span> <ArrowRight className="w-3.5 h-3.5 text-[#061C2B]" />
                                         </button>
                                     </div>
 
@@ -544,6 +556,7 @@ export default function RoomsPage() {
                         })}
                     </div>
                 </div>
+
             </div>
 
             {/* Video Walkthrough Modal Popup */}
@@ -573,6 +586,19 @@ export default function RoomsPage() {
             {/* Rooms Banner Component - Positioned directly above the footer */}
             <RoomsBanner />
 
+            {/* Custom keyframes for smooth fade-in-up animation */}
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `}</style>
         </div>
     );
 }

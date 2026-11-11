@@ -92,12 +92,13 @@ const RoomsBanner = () => {
 
           </div>
 
-          {/* Right Action Button -> Navigates to /gallery */}
+          {/* Right Action Button -> Navigates to Rooms & Suites Listing Page */}
           <div className="w-full lg:w-auto flex justify-center lg:justify-end shrink-0">
             <button
               type="button"
               onClick={() => {
-                navigate('/gallery');
+                // Navigate to the primary rooms listing view and smooth-scroll to the top of the page
+                navigate('/rooms');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
               className="border border-[#C9A24B] bg-transparent hover:bg-[#C9A24B] text-[#C9A24B] hover:text-[#061C2B] px-5 py-2.5 rounded-xl text-[11px] font-bold tracking-wide transition-all duration-300 shadow-lg flex items-center gap-2 cursor-pointer hover:scale-105"

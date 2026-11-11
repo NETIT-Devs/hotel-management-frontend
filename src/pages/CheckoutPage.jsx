@@ -7,6 +7,7 @@ import checkoutHeroImg from '../assets/checkoutPageHero.webp';
 import hotelLobbyImg from '../assets/hotelLobbyImg.webp';   // Thumbnail image for "Pay at Hotel" card
 import securePaymentImg from '../assets/securePaymentImg.webp'; // Thumbnail image for "Online Payment" card
 import RoomsBanner from '../components/RoomsBanner';
+import { ROOMS_DATA } from '../constants/hotelData';
 
 /**
  * Amenity Icons Mapping Object for Dynamic Summary Display
@@ -111,7 +112,8 @@ export default function CheckoutPage() {
         }
 
         setCurrentStep(2);
-        window.scrollTo({ top: 400, behavior: 'smooth' });
+        // Ensure smooth scroll to top of the checkout form when moving to step 2
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     /**
@@ -135,6 +137,8 @@ export default function CheckoutPage() {
         console.log("Backend Booking Payload Ready:", bookingPayload);
 
         setIsSuccessModalOpen(true);
+        // Ensure smooth scroll to top when opening the success modal
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     return (
@@ -146,14 +150,14 @@ export default function CheckoutPage() {
                 <p>Complete your luxury reservation at Serenity Bay Resort with best price guarantees and secure checkout options.</p>
             </div>
 
-            {/* Hero Banner Section with Local Asset Image */}
+            {/* Hero Banner Section with Local Asset Image & Smooth Fade-In Animation */}
             <header
                 className="relative h-[420px] md:h-[550px] bg-cover bg-center flex flex-col justify-center px-6 pt-20 md:px-12 md:pt-28"
                 style={{
                     backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.88) 0%, rgba(6, 59, 50, 0.5) 40%, rgba(6, 59, 50, 0.15) 70%, rgba(6, 59, 50, 0) 90%), url(${checkoutHeroImg})`
                 }}
             >
-                <div className="max-w-7xl mx-auto w-full text-left">
+                <div className="max-w-7xl mx-auto w-full text-left animate-[fadeInUp_1s_ease-out]">
                     <span className="text-[#C5A253] tracking-[0.2em] uppercase text-xs font-bold block mb-2">
                         HOME &gt; ROOMS &amp; SUITES &gt; BOOKING
                     </span>
@@ -450,7 +454,7 @@ export default function CheckoutPage() {
                                             type="button"
                                             onClick={() => {
                                                 setCurrentStep(1);
-                                                window.scrollTo({ top: 400, behavior: 'smooth' });
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
                                             }}
                                             className="text-xs text-gray-600 hover:text-[#061C2B] flex items-center gap-1 font-medium cursor-pointer transition-colors"
                                             aria-label="Return to Guest Details Step"
@@ -878,6 +882,19 @@ export default function CheckoutPage() {
                 </div>
             )}
 
+            {/* Custom keyframes for smooth fade-in-up animation */}
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `}</style>
         </div>
     );
 }

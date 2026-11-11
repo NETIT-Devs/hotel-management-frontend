@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, Calendar, Menu, X } from 'lucide-react';
 import { NAV_LINKS } from '../constants/hotelData';
 import logoImg from '../assets/logo.png'; // Monogram Logo Asset
@@ -9,7 +10,7 @@ import logoImg from '../assets/logo.png'; // Monogram Logo Asset
  * - Dynamic sticky scroll styling with glassmorphism
  * - Full-screen responsive mobile overlay navigation drawer
  * - Complete accessibility (aria-attributes) & SEO structure
- * - Smart URL routing for Home (/) and Rooms (/rooms) pages
+ * - Smart URL routing for Home (/), Rooms (/rooms), and Offers (/offers) pages
  */
 export default function Navbar() {
     // Mobile navigation state toggle
@@ -51,9 +52,10 @@ export default function Navbar() {
         >
             <div className="max-w-[1500px] mx-auto flex justify-between items-center z-50 relative">
 
-                {/* Brand Logo & Typography Header Link */}
-                <a
-                    href="/"
+                {/* Brand Logo & Typography Header Link with Smooth Scroll to Top */}
+                <Link
+                    to="/"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     className="flex items-center gap-3 md:gap-4 group focus:outline-none"
                     aria-label="Serenity Bay Hotel & Resort - Homepage"
                 >
@@ -75,27 +77,30 @@ export default function Navbar() {
                             HOTEL &amp; RESORT
                         </span>
                     </div>
-                </a>
+                </Link>
 
-                {/* Desktop Navigation Link Items */}
+                {/* Desktop Navigation Link Items with Smooth Scroll to Top */}
                 <div className="hidden lg:flex items-center gap-8 text-sm font-light text-white">
                     {NAV_LINKS.map((link, idx) => {
-                        // Route Home to '/' and Rooms & Suites to '/rooms'
-                        let linkHref = link.href;
+                        // Intelligent path assignment for router navigation
+                        let linkHref = link.href || "/";
                         if (link.label === "Home") {
                             linkHref = "/";
                         } else if (link.label === "Rooms & Suites") {
                             linkHref = "/rooms";
+                        } else if (link.label === "Offers") {
+                            linkHref = "/offers";
                         }
 
                         return (
-                            <a
+                            <Link
                                 key={idx}
-                                href={linkHref}
+                                to={linkHref}
+                                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                                 className="hover:text-[#b8972e] transition duration-300 tracking-wide font-normal"
                             >
                                 {link.label}
-                            </a>
+                            </Link>
                         );
                     })}
                 </div>
@@ -137,25 +142,30 @@ export default function Navbar() {
                     }`}
             >
 
-                {/* Mobile Navigation Links */}
+                {/* Mobile Navigation Links with Smooth Scroll to Top */}
                 <div className="flex flex-col gap-6 text-center">
                     {NAV_LINKS.map((link, idx) => {
-                        let mobileLinkHref = link.href;
+                        let mobileLinkHref = link.href || "/";
                         if (link.label === "Home") {
                             mobileLinkHref = "/";
                         } else if (link.label === "Rooms & Suites") {
                             mobileLinkHref = "/rooms";
+                        } else if (link.label === "Offers") {
+                            mobileLinkHref = "/offers";
                         }
 
                         return (
-                            <a
+                            <Link
                                 key={idx}
-                                href={mobileLinkHref}
-                                onClick={() => setIsOpen(false)}
+                                to={mobileLinkHref}
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                }}
                                 className="text-lg font-serif tracking-wider text-white hover:text-[#b8972e] transition duration-300 border-b border-white/10 pb-3"
                             >
                                 {link.label}
-                            </a>
+                            </Link>
                         );
                     })}
                 </div>
