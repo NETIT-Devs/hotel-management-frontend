@@ -245,17 +245,18 @@ export const OFFERS_DATA = [
         category: 'ROMANTIC ESCAPE',
         title: 'A Romantic Getaway',
         subtitle: 'Create unforgettable moments together.',
-        description: 'Enjoy an intimate luxury escape with elegant accommodation and a relaxing atmosphere for two.',
+        description: 'Enjoy an intimate luxury escape with elegant accommodation and a relaxing atmosphere for two.', // Short description for cards/previews
+        longDescription: 'Enjoy an intimate luxury escape with elegant accommodation and a relaxing atmosphere for two. Indulge in a romantic getaway at Serenity Bay, featuring private dining experiences, couple spa treatments, and breathtaking sunset views designed exclusively for your special moments.', // Detailed description for offer details page
         discount: '20% OFF',
         originalPrice: '$250',
         discountedPrice: '$200',
         saveAmount: 'Save $50',
         validUntil: 'Dec 31, 2026',
         images: [
-            'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=85',// Romantic hotel room with ocean view
-            'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1400&q=85', // Couple enjoying a luxury resort pool
-            'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1400&q=85', // Romantic infinity pool at sunset
-            'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1400&q=85', // Luxury tropical resort
+            'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1400&q=85',
+            'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1400&q=85',
+            'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1400&q=85',
+            'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1400&q=85',
         ],
         features: ['Luxury room stay', 'Breakfast for two', 'Late checkout'],
         terms: [
@@ -271,16 +272,17 @@ export const OFFERS_DATA = [
         title: 'Stay a Little Longer',
         subtitle: 'Stay longer, relax more, save more.',
         description: 'Take your time, unwind in comfort and enjoy more of your stay with our extended-stay offer.',
+        longDescription: 'Take your time, unwind in comfort and enjoy more of your stay with our extended-stay offer. Indulge in a luxurious getaway at Serenity Bay, enjoying a perfect blend of comfort, elegance and breathtaking ocean views, designed for your special moments and complete relaxation.',
         discount: '15% OFF',
         originalPrice: '$220',
         discountedPrice: '$187',
         saveAmount: 'Save $33',
         validUntil: 'Jan 15, 2027',
         images: [
-            'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1400&q=85', // Luxury hotel room with sea view
-            'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1400&q=85', // Tropical resort with private pool
-            'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1400&q=85', // Luxury hotel bedroom with balcony
-            'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=1400&q=85', // Tropical villa with private pool
+            'https://images.unsplash.com/photo-1591088398332-8a7791972843?auto=format&fit=crop&w=1400&q=85',
+            'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1400&q=85',
+            'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1400&q=85',
+            'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=1400&q=85',
         ],
         features: ['Minimum 3 nights stay', 'Complimentary Wi-Fi', 'Premium Services'],
         terms: [
@@ -296,16 +298,17 @@ export const OFFERS_DATA = [
         title: 'Plan Ahead & Save',
         subtitle: 'Make your next escape extra special.',
         description: 'Plan your next luxury holiday early and enjoy an exclusive saving on your room reservation.',
+        longDescription: 'Plan your next luxury holiday early and enjoy an exclusive saving on your room reservation. Experience world-class hospitality, pristine beaches, and exceptional dining options at Serenity Bay when you secure your dream vacation well in advance.',
         discount: '10% OFF',
         originalPrice: '$240',
         discountedPrice: '$216',
         saveAmount: 'Save $24',
         validUntil: 'Feb 28, 2027',
         images: [
-            'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=1400&q=85', // Luxury beach resort
-            'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1400&q=85', // Hotel room overlooking the pool
-            'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1400&q=85',  // Luxury resort with ocean view
-            'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=1400&q=85', // Tropical resort with infinity pool
+            'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=1400&q=85',
+            'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1400&q=85',
+            'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=1400&q=85',
+            'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?auto=format&fit=crop&w=1400&q=85',
         ],
         features: ['Advance Reservation', 'Selected Rooms', 'Flexible Travel'],
         terms: [

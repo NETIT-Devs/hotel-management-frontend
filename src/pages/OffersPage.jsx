@@ -215,7 +215,7 @@ function OffersPage() {
                                             className="bg-gradient-to-r from-[#C9A24B] to-[#B38E38] text-[#063B32] hover:opacity-95 px-5 py-3 rounded-xl text-xs font-bold tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer"
                                             aria-label={`Book offer ${offer.title}`}
                                         >
-                                            <span>Book Now</span>
+                                            <span>Book Offer</span>
                                             <ArrowRight className="w-3.5 h-3.5 text-[#063B32]" />
                                         </button>
                                     </div>
