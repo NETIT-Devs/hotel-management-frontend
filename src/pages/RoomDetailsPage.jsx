@@ -25,17 +25,25 @@ import {
   Bath
 } from 'lucide-react';
 import { ROOMS_DATA } from '../constants/hotelData';
+import { fetchLiveRooms } from '../services/publicHotelService';
 import BookingBar from '../components/BookingBar';
 
 const RoomDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [roomsList, setRoomsList] = useState(ROOMS_DATA);
   const [activeTab, setActiveTab] = useState('overview');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [similarScroll, setSimilarScroll] = useState({ left: false, right: false });
 
   // useRef for Similar Rooms horizontal scroll container to ensure 100% working navigation arrows
   const similarRoomsRef = useRef(null);
+
+  useEffect(() => {
+    fetchLiveRooms().then((liveRooms) => {
+      if (liveRooms?.length) setRoomsList(liveRooms);
+    });
+  }, []);
 
   // Scroll to top automatically whenever the room ID changes or page loads
   useEffect(() => {
@@ -53,10 +61,10 @@ const RoomDetailsPage = () => {
   };
 
   // Find the selected room from data or fallback to first room
-  const room = ROOMS_DATA.find((r) => r.id === parseInt(id)) || ROOMS_DATA[0];
+  const room = roomsList.find((r) => r.id === parseInt(id)) || roomsList[0];
 
   // Filter similar rooms for recommendations (excluding current room)
-  const similarRooms = ROOMS_DATA.filter((r) => r.id !== room.id);
+  const similarRooms = roomsList.filter((r) => r.id !== room.id);
 
   useEffect(() => {
     const scrollContainer = similarRoomsRef.current;
@@ -313,7 +321,7 @@ const RoomDetailsPage = () => {
               <button
                 type="button"
                 onClick={() => {
-                  navigate('/checkout', { state: { room } });
+                  navigate('/availability', { state: { selectedRoomId: room.id, selectedRoom: room } });
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 className="bg-gradient-to-r from-[#C9A24B] to-[#B38E38] hover:from-[#B38E38] hover:to-[#9E7C2B] text-black py-3.5 px-8 rounded-xl font-medium text-xs sm:text-sm flex items-center justify-center gap-2.5 transition-all shadow-md hover:shadow-lg active:scale-95 tracking-wide cursor-pointer"

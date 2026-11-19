@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Play, SlidersHorizontal, Users, Bed, ArrowRight, LayoutGrid, List, ChevronDown, X, Waves, Wifi, Wind, DoorOpen, Utensils, Sparkles, Maximize2, Eye, Building2, Castle, BedDouble, Check, DollarSign, Filter } from 'lucide-react';
 import { ROOMS_DATA } from '../constants/hotelData';
+import { fetchLiveRooms } from '../services/publicHotelService';
 import BookingBar from '../components/BookingBar';
 import RoomsBanner from '../components/RoomsBanner';
 import roomsPageHero from '../assets/roomsPageHero.webp';
@@ -29,35 +30,36 @@ const viewIcons = {
     'Garden View': Sparkles
 };
 
-// Extract unique filter options and price bounds from hotel data
-const roomCategories = [...new Set(ROOMS_DATA.map(room => room.category))];
-const roomViews = [...new Set(ROOMS_DATA.map(room => room.view))];
-const bedTypes = [...new Set(ROOMS_DATA.map(room => room.bed))];
-const roomAmenities = [...new Set(ROOMS_DATA.flatMap(room => room.amenities || []))];
-const roomPrices = ROOMS_DATA.map(room => Number(room.price.replace(/[^0-9.]/g, '')));
-const minRoomPrice = Math.min(...roomPrices);
-const maxRoomPrice = Math.max(...roomPrices);
-
-/**
- * RoomsPage Component
- * 
- * Features:
- * - Luxury Hero Section with resort background, typography, and meta description optimized for SEO.
- * - Integrated BookingBar component for seamless reservation flow.
- * - Responsive Mobile Filter Drawer (Full-width on mobile devices) to prevent layout clipping and overlap.
- * - Advanced Filter & Sort Controls (Room Types, Views, Bed Types, Amenities, and Price Range).
- * - 2-Column Responsive Grid and List View with interactive image gallery switcher and video walkthrough modals.
- * - Direct navigation to checkout/booking details flow with smooth scrolling.
- */
 export default function RoomsPage() {
     const navigate = useNavigate();
+    const [roomsList, setRoomsList] = useState(ROOMS_DATA);
+
+    useEffect(() => {
+        fetchLiveRooms().then((liveRooms) => {
+            if (liveRooms?.length) {
+                setRoomsList(liveRooms);
+                const prices = liveRooms.map((r) => Number(String(r.price).replace(/[^0-9.]/g, '')) || 0);
+                if (prices.length) {
+                    setMaxPrice(Math.max(...prices));
+                }
+            }
+        });
+    }, []);
+
+    const roomCategories = useMemo(() => [...new Set(roomsList.map((r) => r.category).filter(Boolean))], [roomsList]);
+    const roomViews = useMemo(() => [...new Set(roomsList.map((r) => r.view).filter(Boolean))], [roomsList]);
+    const bedTypes = useMemo(() => [...new Set(roomsList.map((r) => r.bed).filter(Boolean))], [roomsList]);
+    const roomAmenities = useMemo(() => [...new Set(roomsList.flatMap((r) => r.amenities || []))], [roomsList]);
+    const roomPrices = useMemo(() => roomsList.map((r) => Number(String(r.price).replace(/[^0-9.]/g, '')) || 0), [roomsList]);
+    const minRoomPrice = useMemo(() => (roomPrices.length ? Math.min(...roomPrices) : 0), [roomPrices]);
+    const maxRoomPrice = useMemo(() => (roomPrices.length ? Math.max(...roomPrices) : 1000), [roomPrices]);
 
     // Filter and UI layout state variables
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedViews, setSelectedViews] = useState([]);
     const [selectedBeds, setSelectedBeds] = useState([]);
     const [selectedAmenities, setSelectedAmenities] = useState([]);
-    const [maxPrice, setMaxPrice] = useState(maxRoomPrice);
+    const [maxPrice, setMaxPrice] = useState(1000);
     const [sortBy, setSortBy] = useState('Popular');
     const [viewMode, setViewMode] = useState('grid');
     const [isSortOpen, setIsSortOpen] = useState(false);
@@ -92,7 +94,7 @@ export default function RoomsPage() {
     };
 
     // Comprehensive filter logic based on user selections and pricing boundaries
-    const filteredRooms = ROOMS_DATA.filter(room => {
+    const filteredRooms = roomsList.filter(room => {
         const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(room.category);
         const matchesView = selectedViews.length === 0 || selectedViews.includes(room.view);
         const matchesBed = selectedBeds.length === 0 || selectedBeds.includes(room.bed);
@@ -538,11 +540,11 @@ export default function RoomsPage() {
                                             <span className="text-xs text-gray-600 font-medium">/ night</span>
                                         </div>
 
-                                        {/* Navigate to checkout page with smooth scroll to top */}
+                                        {/* Navigate to availability check with selected room */}
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                navigate('/checkout', { state: { room } });
+                                                navigate('/availability', { state: { selectedRoomId: room.id, selectedRoom: room } });
                                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                                             }}
                                             className="bg-gradient-to-r from-[#C5A253] to-[#b49147] text-[#061C2B] px-5 py-3 rounded-xl text-xs font-bold tracking-wider hover:opacity-95 transition-all shadow-md flex items-center gap-2 cursor-pointer"

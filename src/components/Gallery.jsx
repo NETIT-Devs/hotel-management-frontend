@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { GALLERY_IMAGES } from '../constants/hotelData';
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 /**
  * Gallery Component
@@ -10,6 +13,19 @@ import { GALLERY_IMAGES } from '../constants/hotelData';
  * - SEO optimized semantic tags with clean English documentation
  */
 export default function Gallery() {
+    const navigate = useNavigate();
+    const [images, setImages] = useState(GALLERY_IMAGES);
+
+    useEffect(() => {
+        fetch(`${API_BASE}/gallery`)
+            .then((res) => res.json())
+            .then((data) => {
+                if (Array.isArray(data?.items) && data.items.length > 0) {
+                    setImages(data.items.slice(0, 4).map((i) => i.image_url));
+                }
+            })
+            .catch(() => {});
+    }, []);
     return (
         <section
             id="gallery"
@@ -33,9 +49,13 @@ export default function Gallery() {
 
                 {/* Center: Perfectly Balanced 4-Image Grid Layout */}
                 <div className="flex-1 w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 items-center">
-                    {GALLERY_IMAGES.slice(0, 4).map((img, idx) => (
+                    {images.slice(0, 4).map((img, idx) => (
                         <div
                             key={idx}
+                            onClick={() => {
+                                navigate('/gallery');
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
                             className="w-full h-40 sm:h-44 md:h-48 rounded-2xl overflow-hidden shadow-md group cursor-pointer border border-black/5 relative"
                         >
                             <img
@@ -52,6 +72,10 @@ export default function Gallery() {
                 <div className="lg:w-44 shrink-0 flex justify-center lg:justify-end">
                     <button
                         type="button"
+                        onClick={() => {
+                            navigate('/gallery');
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
                         aria-label="View complete resort photo gallery"
                         className="border border-[#b8972e]/60 text-[#b8972e] px-6 py-3 rounded-full text-xs font-medium hover:bg-[#b8972e] hover:text-black transition duration-300 flex items-center gap-2 shadow-sm bg-transparent whitespace-nowrap cursor-pointer"
                     >

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Calendar, Menu, X, User, LogIn } from 'lucide-react';
+import { Search, Calendar, Menu, X, User, LogIn, LogOut } from 'lucide-react';
 import { NAV_LINKS } from '../constants/hotelData';
 import logoImg from '../assets/logo.png'; // Monogram Logo Asset
 
@@ -23,16 +23,34 @@ export default function Navbar() {
     // User authentication state checked from localStorage
     const [user, setUser] = useState(null);
 
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        setUser(null);
+        window.dispatchEvent(new Event('authChange'));
+    };
+
     useEffect(() => {
-        // Retrieve stored authentication session data
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            try {
-                setUser(JSON.parse(storedUser));
-            } catch (e) {
-                console.error("Failed to parse user session", e);
+        const syncUser = () => {
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                try {
+                    setUser(JSON.parse(storedUser));
+                } catch (e) {
+                    setUser(null);
+                }
+            } else {
+                setUser(null);
             }
-        }
+        };
+
+        syncUser();
+        window.addEventListener('authChange', syncUser);
+        window.addEventListener('storage', syncUser);
+        return () => {
+            window.removeEventListener('authChange', syncUser);
+            window.removeEventListener('storage', syncUser);
+        };
     }, []);
 
     // Event listener to monitor window scroll position
@@ -104,8 +122,12 @@ export default function Navbar() {
                             linkHref = "/";
                         } else if (link.label === "Rooms & Suites") {
                             linkHref = "/rooms";
+                        } else if (link.label === "Facilities") {
+                            linkHref = "/facilities";
                         } else if (link.label === "Offers") {
                             linkHref = "/offers";
+                        } else if (link.label === "Gallery") {
+                            linkHref = "/gallery";
                         }
 
                         return (
@@ -133,15 +155,36 @@ export default function Navbar() {
 
                     {/* Authentication Sign In / Account Link for Desktop */}
                     {user ? (
-                        <Link
-                            to="/account"
-                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                            className="hidden sm:flex items-center gap-2 text-xs font-bold text-[#b8972e] bg-[#061C2B]/80 hover:bg-[#061C2B] px-4 py-2.5 rounded-lg transition border border-[#b8972e]/50 shadow-md focus:outline-none"
-                            aria-label={`Logged in as ${user.full_name || 'User'}`}
-                        >
-                            <User className="w-4 h-4 text-[#b8972e]" />
-                            <span className="truncate max-w-[120px]">{user.full_name || 'Account'}</span>
-                        </Link>
+                        <div className="hidden sm:flex items-center gap-2">
+                            {['ADMIN', 'SUPER_ADMIN'].includes(user.role) && (
+                                <Link
+                                    to="/admin/dashboard"
+                                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                                    className="bg-[#C9A24B]/20 text-[#b8972e] border border-[#b8972e]/70 px-3 py-2 rounded-lg text-xs font-bold hover:bg-[#C9A24B] hover:text-[#061C2B] transition shadow-sm"
+                                    title="Open Admin Dashboard"
+                                >
+                                    Dashboard
+                                </Link>
+                            )}
+                            <Link
+                                to="/my-bookings"
+                                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                                className="flex items-center gap-2 text-xs font-bold text-[#b8972e] bg-[#061C2B]/80 hover:bg-[#061C2B] px-3.5 py-2 rounded-lg border border-[#b8972e]/50 hover:border-[#b8972e] shadow-md transition"
+                                title="View My Bookings & Profile"
+                            >
+                                <User className="w-4 h-4 text-[#b8972e]" />
+                                <span className="truncate max-w-[130px]">{user.fullName || user.full_name || 'My Bookings'}</span>
+                            </Link>
+                            <button
+                                type="button"
+                                onClick={handleLogout}
+                                className="p-2 text-white/70 hover:text-red-400 bg-white/5 hover:bg-white/10 rounded-lg transition border border-white/10 cursor-pointer"
+                                title="Sign Out"
+                                aria-label="Sign Out"
+                            >
+                                <LogOut className="w-4 h-4" />
+                            </button>
+                        </div>
                     ) : (
                         <Link
                             to="/auth"
@@ -155,7 +198,7 @@ export default function Navbar() {
                     )}
 
                     <Link
-                        to="/rooms"
+                        to="/checkout"
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                         className="hidden sm:flex bg-[#b8972e] text-black px-6 py-2.5 rounded text-sm font-semibold items-center gap-2 hover:bg-[#a68525] transition shadow-lg cursor-pointer"
                     >
@@ -190,8 +233,12 @@ export default function Navbar() {
                             mobileLinkHref = "/";
                         } else if (link.label === "Rooms & Suites") {
                             mobileLinkHref = "/rooms";
+                        } else if (link.label === "Facilities") {
+                            mobileLinkHref = "/facilities";
                         } else if (link.label === "Offers") {
                             mobileLinkHref = "/offers";
+                        } else if (link.label === "Gallery") {
+                            mobileLinkHref = "/gallery";
                         }
 
                         return (
@@ -214,17 +261,23 @@ export default function Navbar() {
                 <div className="w-full mt-auto pt-6 flex flex-col gap-3">
                     {/* Sign In / Account Action for Mobile Overlay */}
                     {user ? (
-                        <Link
-                            to="/account"
-                            onClick={() => {
-                                setIsOpen(false);
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }}
-                            className="w-full bg-white/10 border border-[#b8972e]/50 text-[#b8972e] py-3.5 rounded-xl text-base font-medium flex items-center justify-center gap-2 shadow-md hover:bg-white/15 transition cursor-pointer"
-                        >
-                            <User className="w-5 h-5 text-[#b8972e]" />
-                            <span>My Account ({user.full_name || 'User'})</span>
-                        </Link>
+                        <div className="flex flex-col gap-2">
+                            <div className="w-full bg-white/10 border border-[#b8972e]/50 text-[#b8972e] py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2">
+                                <User className="w-4 h-4 text-[#b8972e]" />
+                                <span>{user.fullName || user.full_name || 'My Account'}</span>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    handleLogout();
+                                    setIsOpen(false);
+                                }}
+                                className="w-full bg-red-500/20 text-red-300 border border-red-500/30 py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 hover:bg-red-500/30 transition cursor-pointer"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                <span>Sign Out</span>
+                            </button>
+                        </div>
                     ) : (
                         <Link
                             to="/auth"
@@ -241,14 +294,14 @@ export default function Navbar() {
 
                     {/* Primary Booking CTA Button */}
                     <Link
-                        to="/rooms"
+                        to="/checkout"
                         onClick={() => {
                             setIsOpen(false);
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
                         className="w-full bg-[#b8972e] text-black py-4 rounded-xl text-base font-medium flex items-center justify-center gap-2 shadow-xl hover:bg-[#a68525] transition cursor-pointer"
                     >
-                        <Calendar className="w-5 h-5" /> Book Your Stay
+                        <Calendar className="w-5 h-5" /> Book Now
                     </Link>
                 </div>
             </div>

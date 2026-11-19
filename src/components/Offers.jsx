@@ -1,13 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { OFFERS_DATA } from '../constants/hotelData';
+import { fetchLiveOffers } from '../services/publicHotelService';
 
 export default function Offers() {
     const navigate = useNavigate();
+    const [offersList, setOffersList] = useState(OFFERS_DATA);
+
+    useEffect(() => {
+        fetchLiveOffers().then((offers) => {
+            if (offers?.length) setOffersList(offers);
+        });
+    }, []);
 
     // Automatically slice the array to display only the first 3 offers on the home page
-    const displayedOffers = OFFERS_DATA.slice(0, 3);
+    const displayedOffers = offersList.slice(0, 3);
 
     return (
         // Special Offers & Promotional Packages Section with side-aligned header
@@ -42,10 +50,12 @@ export default function Offers() {
                 {/* Right Side: 3 Offer Cards Grid matching Rooms section style */}
                 <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-3 gap-6">
                     {displayedOffers.map((offer) => {
-                        const displayImage = (offer.images && offer.images[0]) || offer.image || '';
+                        const displayImage = (offer.images && offer.images[0]) || offer.image_url || offer.image || '';
                         const displayTag = offer.category || offer.tag || '';
                         const displayDesc = offer.description || offer.desc || '';
-                        const displayPrice = offer.discountedPrice || offer.price || '';
+                        const displayPrice =
+                            offer.discountedPrice ||
+                            (offer.discounted_price ? `$${Number(offer.discounted_price).toFixed(0)}` : offer.price || '');
 
                         return (
                             <article
@@ -121,7 +131,6 @@ export default function Offers() {
                                         </button>
                                     </div>
                                 </div>
-
                             </article>
                         );
                     })}

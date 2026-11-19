@@ -109,19 +109,21 @@ export default function AuthPage() {
         setLoading(true);
 
         try {
-            let endpoint = 'http://localhost:5000/api/auth/login';
+            const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            let endpoint = `${API_BASE}/auth/login`;
             let payload = { email: formData.email, password: formData.password };
 
             if (currentView === 'register') {
-                endpoint = 'http://localhost:5000/api/auth/register';
+                endpoint = `${API_BASE}/auth/register`;
                 payload = {
+                    fullName: formData.full_name,
                     full_name: formData.full_name,
                     email: formData.email,
                     phone: formData.phone,
                     password: formData.password
                 };
             } else if (currentView === 'forgot') {
-                endpoint = 'http://localhost:5000/api/auth/forgot-password';
+                endpoint = `${API_BASE}/auth/forgot-password`;
                 payload = { email: formData.email };
             }
 
@@ -138,11 +140,22 @@ export default function AuthPage() {
             }
 
             if (currentView === 'login') {
-                setSuccessMsg('Login successful! Redirecting...');
+                const isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(data.user?.role);
+                setSuccessMsg(isAdmin ? 'Admin login successful! Redirecting to Dashboard...' : 'Login successful! Redirecting...');
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                }
                 if (data.user) {
                     localStorage.setItem('user', JSON.stringify(data.user));
                 }
-                setTimeout(() => { navigate('/'); }, 1000);
+                window.dispatchEvent(new Event('authChange'));
+                if (isAdmin) {
+                    setTimeout(() => {
+                        navigate('/admin/dashboard');
+                    }, 600);
+                } else {
+                    setTimeout(() => { navigate('/'); }, 1000);
+                }
             } else if (currentView === 'register') {
                 setSuccessMsg('Account created successfully! Please sign in.');
                 setCurrentView('login');

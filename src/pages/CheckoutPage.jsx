@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Calendar, Users, Bed, Check, ArrowRight, X, Lock, CheckCircle2, BedDouble, FileText, Banknote, CreditCard, Info, Eye, Maximize, Moon, Waves, Wifi, Wind, DoorOpen, Utensils, Sparkles, Clock } from 'lucide-react';
+import { ShieldCheck, Calendar, Users, Bed, Check, ArrowRight, X, Lock, CheckCircle2, BedDouble, FileText, Banknote, CreditCard, Info, Eye, Maximize, Moon, Waves, Wifi, Wind, DoorOpen, Utensils, Sparkles, Clock, AlertCircle } from 'lucide-react';
 // Import local hero banner image asset
 import checkoutHeroImg from '../assets/checkoutPageHero.webp';
 // Import local asset images for Payment Method step thumbnails
@@ -41,15 +41,36 @@ export default function CheckoutPage() {
     // Get selected room from navigation state or fallback to the first room in data
     const room = location.state?.room || ROOMS_DATA[0];
 
+    // Helper to format Date to YYYY-MM-DD
+    const formatIsoDate = (d) => {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    const todayDate = new Date();
+    const todayIso = formatIsoDate(todayDate);
+    const tomorrowDate = new Date();
+    tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+    const defaultCheckIn = location.state?.checkIn || location.state?.checkInDate || formatIsoDate(tomorrowDate);
+    const threeDaysLater = new Date();
+    threeDaysLater.setDate(threeDaysLater.getDate() + 4);
+    const defaultCheckOut = location.state?.checkOut || location.state?.checkOutDate || formatIsoDate(threeDaysLater);
+
     // Multi-step navigation state (1: Stay & Guest Details, 2: Payment Method)
     const [currentStep, setCurrentStep] = useState(1);
 
     // Form state variables
-    const [checkInDate, setCheckInDate] = useState(location.state?.checkInDate || 'Nov 15, 2025');
-    const [checkOutDate, setCheckOutDate] = useState(location.state?.checkOutDate || 'Nov 18, 2025');
+    const [checkInDate, setCheckInDate] = useState(defaultCheckIn);
+    const [checkOutDate, setCheckOutDate] = useState(defaultCheckOut);
     const [adults, setAdults] = useState(location.state?.adults || '2');
     const [children, setChildren] = useState(location.state?.children || '0');
     const [roomsCount, setRoomsCount] = useState(location.state?.roomsCount || '1');
+    const [residency, setResidency] = useState(
+        location.state?.residency === 'Resident' ? 'Resident' : 'Non-Resident'
+    );
+    const [guestIdNumber, setGuestIdNumber] = useState('');
 
     // Guest Information State
     const [firstName, setFirstName] = useState('');
@@ -60,15 +81,49 @@ export default function CheckoutPage() {
     const [paymentMethod, setPaymentMethod] = useState('hotel'); // Default to Pay at Hotel
     const [agreedTerms, setAgreedTerms] = useState(false);
 
+    // Booking submission status states
+    const [bookingError, setBookingError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [confirmedBookingId, setConfirmedBookingId] = useState(null);
+
+    // Auto-fill logged-in user profile if available
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            try {
+                const u = JSON.parse(storedUser);
+                if (u.email) setEmail(u.email);
+                if (u.fullName || u.full_name) {
+                    const nameParts = (u.fullName || u.full_name).trim().split(' ');
+                    setFirstName(nameParts[0] || '');
+                    setLastName(nameParts.slice(1).join(' ') || '');
+                }
+                if (u.phone) {
+                    setPhone(u.phone.replace('+94', '').trim());
+                }
+            } catch (e) {
+                console.error('Failed to parse user session for checkout', e);
+            }
+        }
+    }, []);
+
     // Modal states for success confirmation and cancellation policy view
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
     const [isPolicyModalOpen, setIsPolicyModalOpen] = useState(false);
     const [summaryHeight, setSummaryHeight] = useState(null);
     const formRef = useRef(null);
 
-    // Calculate pricing details dynamically
-    const basePriceNum = Number(room.price ? room.price.replace(/[^0-9.]/g, '') : 280);
-    const nights = 3; // Default sample nights
+    // Calculate pricing details dynamically based on dates & residency (supports both Room and Offer objects)
+    const rawPriceStr = String(room.price || room.discountedPrice || room.discounted_price || room.originalPrice || '280');
+    const nonResidentBase = Number(room.price_per_night) || Number(rawPriceStr.replace(/[^0-9.]/g, '')) || 280;
+    const residentBase = Number(room.resident_price_per_night) > 0
+        ? Number(room.resident_price_per_night)
+        : Math.round(nonResidentBase * 0.75);
+    const basePriceNum = residency === 'Resident' && !room.discountedPrice ? residentBase : nonResidentBase;
+    const checkInTime = new Date(checkInDate).getTime();
+    const checkOutTime = new Date(checkOutDate).getTime();
+    const nights = Math.max(1, Math.round((checkOutTime - checkInTime) / (1000 * 60 * 60 * 24)) || 1);
+    const calculatedNights = nights;
     const roomRateTotal = basePriceNum * nights * Number(roomsCount);
     const taxesAndFees = Math.round(roomRateTotal * 0.15);
 
@@ -117,28 +172,64 @@ export default function CheckoutPage() {
     };
 
     /**
-     * Handle final booking confirmation and trigger success modal popup.
+     * Handle final booking confirmation and send request to backend API.
      */
-    const handleConfirmBooking = (e) => {
+    const handleConfirmBooking = async (e) => {
         e.preventDefault();
+        setBookingError('');
+        setIsSubmitting(true);
 
-        const bookingPayload = {
-            roomTitle: room.title,
-            checkInDate,
-            checkOutDate,
-            adults,
-            children,
-            roomsCount,
-            guest: { firstName, lastName, email, phone: `+94${phone}` },
-            specialRequests,
-            paymentMethod,
-            totalAmount
-        };
-        console.log("Backend Booking Payload Ready:", bookingPayload);
+        try {
+            const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const token = localStorage.getItem('token');
 
-        setIsSuccessModalOpen(true);
-        // Ensure smooth scroll to top when opening the success modal
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+            const payload = {
+                roomId: Number(room.room_id || room.id) || 1,
+                checkIn: checkInDate,
+                checkOut: checkOutDate,
+                adults: Number(adults) || 1,
+                children: Number(children) || 0,
+                guests: (Number(adults) || 1) + (Number(children) || 0),
+                roomsCount: Number(roomsCount) || 1,
+                guest_first_name: firstName,
+                guest_last_name: lastName,
+                guest_email: email,
+                guest_phone: phone ? `+94${phone}` : '',
+                residency,
+                guest_id_number: guestIdNumber,
+                special_requests: specialRequests,
+                payment_method: paymentMethod === 'hotel' ? 'PAY_AT_HOTEL' : 'ONLINE',
+                total_price: totalAmount,
+                totalAmount: totalAmount
+            };
+
+            const response = await fetch(`${API_BASE}/bookings`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to complete booking reservation.');
+            }
+
+            if (data.booking?.id) {
+                setConfirmedBookingId(data.booking.id);
+            }
+
+            setIsSuccessModalOpen(true);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (err) {
+            console.error('Booking submission error:', err);
+            setBookingError(err.message || 'Could not complete reservation. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -259,26 +350,36 @@ export default function CheckoutPage() {
                                         <div>
                                             <label className="block text-xs font-medium text-gray-600 mb-1">Check-in Date</label>
                                             <div className="relative">
-                                                <Calendar className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                                                <Calendar className="absolute left-3 top-3 w-4 h-4 text-[#C9A24B]" />
                                                 <input
-                                                    type="text"
+                                                    type="date"
+                                                    min={todayIso}
                                                     value={checkInDate}
-                                                    readOnly
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        setCheckInDate(val);
+                                                        if (checkOutDate <= val) {
+                                                            const d = new Date(val);
+                                                            d.setDate(d.getDate() + 1);
+                                                            setCheckOutDate(formatIsoDate(d));
+                                                        }
+                                                    }}
                                                     aria-label="Check-in Date"
-                                                    className="w-full bg-gray-100 border border-[#e5dfd4] rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-700 cursor-not-allowed select-none"
+                                                    className="w-full bg-white border border-[#e5dfd4] rounded-xl pl-10 pr-4 py-2 text-xs text-gray-700 focus:outline-none focus:border-[#C9A24B]"
                                                 />
                                             </div>
                                         </div>
                                         <div>
                                             <label className="block text-xs font-medium text-gray-600 mb-1">Check-out Date</label>
                                             <div className="relative">
-                                                <Calendar className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                                                <Calendar className="absolute left-3 top-3 w-4 h-4 text-[#C9A24B]" />
                                                 <input
-                                                    type="text"
+                                                    type="date"
+                                                    min={checkInDate}
                                                     value={checkOutDate}
-                                                    readOnly
+                                                    onChange={(e) => setCheckOutDate(e.target.value)}
                                                     aria-label="Check-out Date"
-                                                    className="w-full bg-gray-100 border border-[#e5dfd4] rounded-xl pl-10 pr-4 py-2.5 text-xs text-gray-700 cursor-not-allowed select-none"
+                                                    className="w-full bg-white border border-[#e5dfd4] rounded-xl pl-10 pr-4 py-2 text-xs text-gray-700 focus:outline-none focus:border-[#C9A24B]"
                                                 />
                                             </div>
                                         </div>
@@ -323,6 +424,33 @@ export default function CheckoutPage() {
                                                     className="w-full bg-gray-100 border border-[#e5dfd4] rounded-xl pl-10 pr-3 py-2.5 text-xs text-gray-700 cursor-not-allowed select-none"
                                                 />
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600 mb-1">Guest Residency *</label>
+                                            <select
+                                                value={residency}
+                                                onChange={(e) => setResidency(e.target.value)}
+                                                className="w-full bg-white border border-[#e5dfd4] rounded-xl px-4 py-2.5 text-xs text-[#061C2B] font-semibold focus:outline-none focus:border-[#C9A24B]"
+                                            >
+                                                <option value="Non-Resident">Non-Resident (International Guest)</option>
+                                                <option value="Resident">Sri Lankan Resident (Local ID Rate)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                                                {residency === 'Resident' ? 'Sri Lankan NIC Number *' : 'Passport Number (Optional)'}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                placeholder={residency === 'Resident' ? 'e.g. 199812345678 or 981234567V' : 'Enter passport number'}
+                                                value={guestIdNumber}
+                                                onChange={(e) => setGuestIdNumber(e.target.value)}
+                                                required={residency === 'Resident'}
+                                                className="w-full bg-white border border-[#e5dfd4] rounded-xl px-4 py-2.5 text-xs text-[#061C2B] focus:outline-none focus:border-[#C9A24B]"
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -396,6 +524,33 @@ export default function CheckoutPage() {
                                                     required
                                                 />
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600 mb-1">Guest Residency *</label>
+                                            <select
+                                                value={residency}
+                                                onChange={(e) => setResidency(e.target.value)}
+                                                className="w-full bg-white border border-[#e5dfd4] rounded-xl px-4 py-2.5 text-xs text-[#061C2B] font-semibold focus:outline-none focus:border-[#C9A24B]"
+                                            >
+                                                <option value="Non-Resident">Non-Resident (International Guest)</option>
+                                                <option value="Resident">Sri Lankan Resident (Local ID Rate)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-medium text-gray-600 mb-1">
+                                                {residency === 'Resident' ? 'Sri Lankan NIC Number *' : 'Passport Number (Optional)'}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                placeholder={residency === 'Resident' ? 'e.g. 199812345678 or 981234567V' : 'Enter passport number'}
+                                                value={guestIdNumber}
+                                                onChange={(e) => setGuestIdNumber(e.target.value)}
+                                                required={residency === 'Resident'}
+                                                className="w-full bg-white border border-[#e5dfd4] rounded-xl px-4 py-2.5 text-xs text-[#061C2B] focus:outline-none focus:border-[#C9A24B]"
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -579,13 +734,21 @@ export default function CheckoutPage() {
                                         </div>
                                     </div>
 
+                                    {bookingError && (
+                                        <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center gap-2.5 mt-3">
+                                            <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                                            <span>{bookingError}</span>
+                                        </div>
+                                    )}
+
                                     {/* Main Action CTA Button: Final Confirmation */}
                                     <button
                                         type="submit"
-                                        className="w-full bg-[#C9A24B] text-[#061C2B] py-4 rounded-xl text-xs font-bold tracking-wider hover:bg-[#b49147] transition shadow-lg flex items-center justify-center gap-2 cursor-pointer mt-4"
+                                        disabled={isSubmitting}
+                                        className="w-full bg-[#C9A24B] text-[#061C2B] py-4 rounded-xl text-xs font-bold tracking-wider hover:bg-[#b49147] transition shadow-lg flex items-center justify-center gap-2 cursor-pointer mt-4 disabled:opacity-60"
                                         aria-label="Confirm Booking and Review Reservation Details"
                                     >
-                                        <span>Review &amp; Confirm</span>
+                                        <span>{isSubmitting ? 'Processing Reservation...' : 'Review & Confirm Reservation'}</span>
                                         <ArrowRight className="w-4 h-4" />
                                     </button>
                                 </form>
@@ -606,7 +769,7 @@ export default function CheckoutPage() {
                         <div className="bg-black/20 rounded-xl overflow-hidden mb-4 border border-white/10">
                             <div className="h-40 relative overflow-hidden">
                                 <img
-                                    src={room.images ? room.images[0] : checkoutHeroImg}
+                                    src={room.images?.[0] || room.image_url || room.image || checkoutHeroImg}
                                     alt={room.title}
                                     className="w-full h-full object-cover"
                                 />
@@ -852,7 +1015,9 @@ export default function CheckoutPage() {
                         </div>
                         <p className="text-xs text-gray-500 font-light mb-4">
                             Booking Reference:{' '}
-                            <strong className="text-[#063B32] text-sm font-extrabold tracking-wider">SBHR-2025-00123</strong>
+                            <strong className="text-[#063B32] text-sm font-extrabold tracking-wider">
+                                SBHR-2026-{String(confirmedBookingId || '00123').padStart(5, '0')}
+                            </strong>
                         </p>
 
                         <div className="bg-white p-4 rounded-xl border border-[#e5dfd4] mb-5 text-left text-xs space-y-2 shadow-xs">
@@ -861,23 +1026,61 @@ export default function CheckoutPage() {
                             <div className="flex justify-between"><span className="text-gray-500">Rooms Reserved:</span> <span className="font-medium text-[#061C2B]">{roomsCount} {Number(roomsCount) > 1 ? 'Rooms' : 'Room'}</span></div>
                             <div className="flex justify-between"><span className="text-gray-500">Check-in:</span> <span className="font-medium text-[#061C2B]">{checkInDate}</span></div>
                             <div className="flex justify-between"><span className="text-gray-500">Check-out:</span> <span className="font-medium text-[#061C2B]">{checkOutDate}</span></div>
-                            <div className="flex justify-between"><span className="text-gray-500">Payment:</span> <span className="font-medium text-[#063B32]">Pay at Hotel (Due at property)</span></div>
+                            <div className="flex justify-between"><span className="text-gray-500">Payment:</span> <span className="font-medium text-[#063B32]">{paymentMethod === 'hotel' ? 'Pay at Hotel (Due at property)' : 'Online Payment'}</span></div>
                             <div className="flex justify-between items-baseline pt-2 border-t border-gray-100"><span className="text-gray-700 font-semibold">Total Due:</span> <span className="font-serif text-xl font-bold text-[#C9A24B]">${totalAmount}.00</span></div>
                         </div>
 
-                        <p className="text-[11px] text-gray-500 font-light mb-5">Thank you for choosing Serenity Bay Hotel &amp; Resort. We look forward to welcoming you soon!</p>
+                        <p className="text-[11px] text-gray-500 font-light mb-5">Thank you for choosing Serenity Bay Hotel &amp; Resort. Your booking request has been submitted to the management.</p>
 
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setIsSuccessModalOpen(false);
-                                navigate('/my-bookings');
-                            }}
-                            className="w-full bg-[#C9A24B] text-[#061C2B] py-3.5 rounded-xl text-xs font-bold tracking-wider hover:bg-[#b49147] transition shadow-md cursor-pointer flex items-center justify-center gap-2"
-                        >
-                            <span>View Booking Details</span>
-                            <ArrowRight className="w-4 h-4" />
-                        </button>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsSuccessModalOpen(false);
+                                    navigate('/my-bookings', {
+                                        state: {
+                                            recentBooking: {
+                                                id: confirmedBookingId,
+                                                room_id: Number(room.room_id || room.id) || 1,
+                                                room_name: room.title,
+                                                image_url: room.images?.[0] || room.image || checkoutHeroImg,
+                                                check_in: checkInDate,
+                                                check_out: checkOutDate,
+                                                guests: (Number(adults) || 1) + (Number(children) || 0),
+                                                adults: Number(adults) || 1,
+                                                children: Number(children) || 0,
+                                                rooms_count: Number(roomsCount) || 1,
+                                                total_price: totalAmount,
+                                                status: 'PENDING',
+                                                payment_method: paymentMethod === 'hotel' ? 'PAY_AT_HOTEL' : 'ONLINE',
+                                                special_requests: specialRequests,
+                                                guest_first_name: firstName,
+                                                guest_last_name: lastName,
+                                                guest_email: email,
+                                                guest_phone: phone ? `+94${phone}` : '',
+                                                residency,
+                                                guest_id_number: guestIdNumber,
+                                            },
+                                        },
+                                    });
+                                }}
+                                className="flex-1 bg-[#063B32] text-[#C9A24B] py-3.5 rounded-xl text-xs font-bold tracking-wider hover:opacity-95 transition shadow-md cursor-pointer flex items-center justify-center gap-2 border border-[#C9A24B]/40"
+                            >
+                                <span>View My Booking</span>
+                                <ArrowRight className="w-4 h-4" />
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsSuccessModalOpen(false);
+                                    navigate('/');
+                                }}
+                                className="flex-1 bg-[#C9A24B] text-[#061C2B] py-3.5 rounded-xl text-xs font-bold tracking-wider hover:bg-[#b49147] transition shadow-md cursor-pointer flex items-center justify-center gap-2"
+                            >
+                                <span>Back to Home</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

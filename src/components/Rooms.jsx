@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Users, Bed, Maximize2 } from 'lucide-react';
 import { ROOMS_DATA } from '../constants/hotelData';
+import { fetchLiveRooms } from '../services/publicHotelService';
 
 /**
  * Rooms Component (Home Section)
@@ -13,9 +14,16 @@ import { ROOMS_DATA } from '../constants/hotelData';
  */
 export default function Rooms() {
     const navigate = useNavigate();
+    const [roomsList, setRoomsList] = useState(ROOMS_DATA);
+
+    useEffect(() => {
+        fetchLiveRooms().then((rooms) => {
+            if (rooms?.length) setRoomsList(rooms);
+        });
+    }, []);
 
     // Automatically slice the array to display only the first 3 rooms on the home page
-    const displayedRooms = ROOMS_DATA.slice(0, 3);
+    const displayedRooms = roomsList.slice(0, 3);
 
     return (
         <section id="rooms" className="bg-[#F2EFE9] py-20 px-6 md:px-12 text-black" aria-label="Featured Rooms Section">
@@ -49,7 +57,7 @@ export default function Rooms() {
                 {/* Right Side: 3 Room Cards Grid */}
                 <div className="lg:col-span-9 grid grid-cols-1 md:grid-cols-3 gap-6">
                     {displayedRooms.map((room) => {
-                        const displayImage = (room.images && room.images[0]) || room.image || '';
+                        const displayImage = (room.images && room.images[0]) || room.image_url || room.image || '';
                         const displayCategory = room.category || '';
 
                         return (

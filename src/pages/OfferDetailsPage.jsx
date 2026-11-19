@@ -22,8 +22,11 @@ import {
     Coffee
 } from 'lucide-react';
 
-// Centralized Data Import from hotelData.js
+// Centralized data import from hotelData.js + live API & shared utilities
 import { OFFERS_DATA as offers } from '../constants/hotelData';
+import { fetchLiveOffers } from '../services/publicHotelService';
+import { applyPageSEO } from '../utils/seo';
+import { parsePriceValue } from '../utils/offerPricing';
 import BookingBar from '../components/BookingBar';
 import hotelLobbyImg from '../assets/hotelLobbyImg.webp';
 
@@ -108,13 +111,49 @@ function OtherOfferCard({ offer }) {
 export default function OfferDetailsPage() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const offer = offers.find((item) => String(item.id) === String(id));
-    const otherOffers = offers.filter((item) => String(item.id) !== String(id));
+    const [offersList, setOffersList] = useState(offers);
     const otherOffersRef = useRef(null);
     const [otherOffersScroll, setOtherOffersScroll] = useState({ left: false, right: false });
 
+    useEffect(() => {
+        fetchLiveOffers().then((liveOffers) => {
+            if (liveOffers?.length) setOffersList(liveOffers);
+        });
+    }, []);
+
+    const offer = offersList.find((item) => String(item.id) === String(id));
+    const otherOffers = offersList.filter((item) => String(item.id) !== String(id));
+
     // Image slider state for the main offer image gallery
     const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+    // Apply dynamic SEO metadata & Schema.org Offer structured data for search engines
+    useEffect(() => {
+        if (!offer) return undefined;
+        const discountedNum = parsePriceValue(offer.discountedPrice);
+        return applyPageSEO({
+            title: `${offer.title} (${offer.discount || 'Special Offer'})`,
+            description:
+                offer.longDescription ||
+                offer.description ||
+                'Exclusive luxury hotel offer at Serenity Bay Hotel & Resort.',
+            canonicalPath: `/offers/${offer.id}`,
+            jsonLd: {
+                '@context': 'https://schema.org',
+                '@type': 'Offer',
+                name: offer.title,
+                description: offer.longDescription || offer.description,
+                category: offer.category || 'Hotel Offer',
+                priceCurrency: 'USD',
+                price: discountedNum || undefined,
+                availability: 'https://schema.org/InStock',
+                seller: {
+                    '@type': 'Hotel',
+                    name: 'Serenity Bay Hotel & Resort'
+                }
+            }
+        });
+    }, [offer]);
 
     // Update scroll indicators based on container position
     useEffect(() => {
@@ -372,17 +411,34 @@ export default function OfferDetailsPage() {
                                     </div>
                                 </div>
 
-                                {/* Book Offer Button - Changed text case to 'Book offer' (B and O capitalized) */}
+                                {/* Eligible Suite Scope Note */}
+                                <div className="mb-4 px-3.5 py-2.5 rounded-xl bg-white/10 border border-[#C9A24B]/30 text-center">
+                                    <span className="text-[10px] uppercase tracking-[0.2em] text-[#C9A24B] font-bold block mb-0.5">
+                                        Offer Eligibility
+                                    </span>
+                                    <span className="text-xs text-white font-medium">
+                                        {offer.room_name
+                                            ? `Valid for ${offer.room_name}`
+                                            : 'Valid across all eligible suites'}
+                                    </span>
+                                </div>
+
+                                {/* Book Offer Button -> Routes to Live Availability Check with Auto-Applied Offer */}
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        navigate('/checkout', { state: { room: offer } });
+                                        navigate(`/availability?offerId=${offer.id}`, {
+                                            state: {
+                                                selectedOffer: offer,
+                                                selectedRoomId: offer.room_id || null
+                                            }
+                                        });
                                         window.scrollTo({ top: 0, behavior: 'smooth' });
                                     }}
                                     className="w-full bg-gradient-to-r from-[#C9A24B] to-[#B38E38] text-[#063B32] py-3.5 px-4 rounded-2xl text-xs font-bold hover:opacity-95 transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer mb-6"
-                                    aria-label="Proceed to book this special offer"
+                                    aria-label={`Check live availability and book ${offer.title}`}
                                 >
-                                    <span className="normal-case font-extrabold text-sm tracking-normal">Book offer</span>
+                                    <span className="normal-case font-extrabold text-sm tracking-normal">Check Availability &amp; Book</span>
                                     <ArrowRight className="w-4 h-4 text-[#063B32]" aria-hidden="true" />
                                 </button>
 

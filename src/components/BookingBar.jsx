@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar as CalendarIcon, Users, Globe, Sparkles, Tag, ArrowRight, Plus, Minus, Trash2 } from 'lucide-react';
 
 const cloneRooms = (roomsToClone) =>
@@ -16,6 +17,7 @@ const cloneRooms = (roomsToClone) =>
  * - Maintained automatic live check-in and check-out default dates.
  */
 export default function BookingBar() {
+    const navigate = useNavigate();
     // Get today's and tomorrow's ISO date strings for default live values
     const formatIsoDate = (date) => {
         const year = date.getFullYear();
@@ -226,7 +228,8 @@ export default function BookingBar() {
             experience,
             promoCode: promoCode.trim() || null
         };
-        console.log("Submitting Luxury Booking Payload:", searchPayload);
+        navigate('/availability', { state: searchPayload });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     return (

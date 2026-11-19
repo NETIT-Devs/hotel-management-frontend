@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { OFFERS_DATA as offers } from '../constants/hotelData';
+import { OFFERS_DATA as staticOffers } from '../constants/hotelData';
+import { fetchLiveOffers } from '../services/publicHotelService';
 import BookingBar from '../components/BookingBar';
 import { ArrowRight, Sparkles, Crown, Heart, CalendarDays, Clock } from 'lucide-react';
 import RoomsBanner from '../components/RoomsBanner';
@@ -16,6 +17,13 @@ import offersHeroImg from '../assets/OffersPageHero.webp';
 function OffersPage() {
     const navigate = useNavigate();
     const [selectedTab, setSelectedTab] = useState('All Offers');
+    const [offers, setOffers] = useState(staticOffers);
+
+    useEffect(() => {
+        fetchLiveOffers().then((mapped) => {
+            if (mapped?.length) setOffers(mapped);
+        });
+    }, []);
 
     // Auto-filter offers dynamically based on the selected tab category.
     const filteredOffers = selectedTab === 'All Offers'
