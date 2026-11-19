@@ -353,23 +353,23 @@ const DashboardOverview = () => {
         </div>
       )}
 
-      {/* 6 Luxury KPI Cards */}
+      {/* 6 Balanced Horizontal Executive KPI Cards (3x2 Airy Grid) */}
       <section className="dashboard-metrics" aria-label="Hotel KPI Summary">
         {metricCards.map(({ label, value, badge, subtext, icon: Icon, tone }) => (
           <article className={`dashboard-metric-card tone-${tone}`} key={label}>
-            <div className="dashboard-metric-top">
-              <div className={`dashboard-metric-icon dashboard-metric-${tone}`}>
-                <Icon size={20} />
-              </div>
-              <span className={`dashboard-metric-badge badge-${tone}`}>
-                <TrendingUp size={11} />
-                {badge}
-              </span>
-            </div>
             <div className="dashboard-metric-body">
               <span className="dashboard-metric-label">{label}</span>
               <strong className="dashboard-metric-value">{value}</strong>
               <small className="dashboard-metric-subtext">{subtext}</small>
+            </div>
+            <div className="dashboard-metric-aside">
+              <div className={`dashboard-metric-icon dashboard-metric-${tone}`}>
+                <Icon size={19} aria-hidden="true" />
+              </div>
+              <span className={`dashboard-metric-badge badge-${tone}`}>
+                <TrendingUp size={10} aria-hidden="true" />
+                {badge}
+              </span>
             </div>
           </article>
         ))}

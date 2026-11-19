@@ -281,30 +281,30 @@ body {
   border: 1px solid var(--color-border);
 }
 
-/* ================= OVERVIEW PAGE ================= */
+/* ================= OVERVIEW PAGE (BALANCED EXECUTIVE LUXURY UI) ================= */
 .dashboard-overview {
-  margin-top: 20px;
+  margin-top: 24px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .dashboard-welcome-section {
   background: linear-gradient(
-    130deg,
+    125deg,
     var(--color-emerald-dark) 0%,
-    #084c40 52%,
+    #07473c 55%,
     var(--color-navy-deep) 100%
   );
   border-radius: 20px;
   padding: 24px 28px;
   color: #ffffff;
-  border: 1px solid rgba(201, 162, 75, 0.35);
-  box-shadow: 0 16px 36px rgba(6, 28, 43, 0.16);
+  border: 1px solid rgba(201, 162, 75, 0.34);
+  box-shadow: 0 14px 32px rgba(6, 28, 43, 0.14);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 22px;
   flex-wrap: wrap;
 }
 
@@ -315,7 +315,7 @@ body {
 .welcome-badge-row {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
   color: var(--color-gold-luxury);
   margin-bottom: 6px;
 }
@@ -329,9 +329,9 @@ body {
 
 .dashboard-welcome-section h2 {
   font-family: "Playfair Display", serif;
-  font-size: 27px;
-  line-height: 1.2;
-  margin: 0 0 8px;
+  font-size: 24px;
+  line-height: 1.25;
+  margin: 0 0 6px;
   font-weight: 600;
 }
 
@@ -341,7 +341,7 @@ body {
 
 .dashboard-welcome-section p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.84);
+  color: rgba(255, 255, 255, 0.82);
   font-size: 13px;
   line-height: 1.55;
 }
@@ -349,7 +349,7 @@ body {
 .dashboard-welcome-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
@@ -358,9 +358,9 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 10px 16px;
+  padding: 10px 18px;
   border-radius: 12px;
-  font-size: 12px;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -369,8 +369,8 @@ body {
 .dashboard-btn-primary {
   background: linear-gradient(135deg, var(--color-gold-luxury), #b68d35);
   color: var(--color-navy-deep);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 18px rgba(201, 162, 75, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 8px 18px rgba(201, 162, 75, 0.26);
 }
 
 .dashboard-btn-primary:hover {
@@ -381,7 +381,7 @@ body {
 .dashboard-btn-secondary {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  border: 1px solid rgba(201, 162, 75, 0.45);
+  border: 1px solid rgba(201, 162, 75, 0.42);
 }
 
 .dashboard-btn-secondary:hover {
@@ -409,64 +409,105 @@ body {
   border: 1px solid #f2c6be;
   color: #9e3f32;
   padding: 12px 16px;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 13px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-/* ================= 6 KPI CARDS ================= */
+/* ================= 6 BALANCED EXECUTIVE KPI CARDS (3x2 AIRY HORIZONTAL) ================= */
 .dashboard-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  gap: 18px;
 }
 
 .dashboard-metric-card {
   background: var(--color-surface);
   border-radius: 18px;
-  padding: 18px 20px;
+  padding: 20px 22px;
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 8px 24px rgba(6, 28, 43, 0.05);
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
   position: relative;
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .dashboard-metric-card::before {
   content: "";
   position: absolute;
   top: 0;
+  bottom: 0;
   left: 0;
-  right: 0;
-  height: 3px;
+  width: 3.5px;
   background: linear-gradient(
-    90deg,
+    180deg,
     var(--color-emerald-dark),
     var(--color-gold-luxury)
   );
+  opacity: 0.85;
+}
+
+.dashboard-metric-card.tone-gold::before {
+  background: linear-gradient(180deg, var(--color-gold-luxury), #9a7322);
+}
+
+.dashboard-metric-card.tone-navy::before {
+  background: linear-gradient(180deg, var(--color-navy-deep), var(--color-emerald-dark));
 }
 
 .dashboard-metric-card:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-card);
+  border-color: rgba(201, 162, 75, 0.55);
+  box-shadow: 0 14px 30px rgba(6, 28, 43, 0.08);
 }
 
-.dashboard-metric-top {
+.dashboard-metric-body {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.dashboard-metric-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.dashboard-metric-value {
+  font-family: "Playfair Display", serif;
+  font-variant-numeric: tabular-nums;
+  font-size: 27px;
+  line-height: 1.15;
+  color: var(--color-navy-deep);
+  font-weight: 700;
+}
+
+.dashboard-metric-subtext {
+  font-size: 11.5px;
+  color: var(--color-muted);
+}
+
+.dashboard-metric-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 10px;
+  flex-shrink: 0;
 }
 
 .dashboard-metric-icon {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 13px;
   display: grid;
   place-items: center;
@@ -474,7 +515,7 @@ body {
 }
 
 .dashboard-metric-emerald {
-  background: rgba(6, 59, 50, 0.1);
+  background: rgba(6, 59, 50, 0.09);
   color: var(--color-emerald-dark);
 }
 
@@ -484,7 +525,7 @@ body {
 }
 
 .dashboard-metric-navy {
-  background: rgba(6, 28, 43, 0.1);
+  background: rgba(6, 28, 43, 0.09);
   color: var(--color-navy-deep);
 }
 
@@ -494,64 +535,40 @@ body {
   gap: 4px;
   padding: 4px 10px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .badge-emerald {
-  background: rgba(6, 59, 50, 0.09);
+  background: rgba(6, 59, 50, 0.08);
   color: var(--color-emerald-dark);
 }
 
 .badge-gold {
-  background: rgba(201, 162, 75, 0.18);
+  background: rgba(201, 162, 75, 0.16);
   color: #8c6717;
 }
 
 .badge-navy {
-  background: rgba(6, 28, 43, 0.08);
+  background: rgba(6, 28, 43, 0.07);
   color: var(--color-navy-deep);
-}
-
-.dashboard-metric-body {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.dashboard-metric-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--color-muted);
-}
-
-.dashboard-metric-value {
-  font-family: "Playfair Display", serif;
-  font-size: 28px;
-  line-height: 1.15;
-  color: var(--color-navy-deep);
-  font-weight: 700;
-}
-
-.dashboard-metric-subtext {
-  font-size: 11px;
-  color: var(--color-muted);
 }
 
 /* ================= CHARTS & ROOM AVAILABILITY GRID ================= */
 .dashboard-content-grid {
   display: grid;
   grid-template-columns: 1.25fr 1fr;
-  gap: 20px;
+  gap: 22px;
   align-items: stretch;
 }
 
 .dashboard-panel {
   background: var(--color-surface);
   border-radius: 20px;
-  padding: 22px 24px;
+  padding: 24px 26px;
   border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 8px 26px rgba(6, 28, 43, 0.05);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -561,8 +578,10 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(229, 222, 208, 0.7);
 }
 
 .panel-eyebrow {
@@ -577,13 +596,13 @@ body {
 .dashboard-panel-heading h3 {
   margin: 0;
   font-family: "Playfair Display", serif;
-  font-size: 20px;
+  font-size: 19px;
   color: var(--color-navy-deep);
   font-weight: 700;
 }
 
 .dashboard-panel-heading p {
-  margin: 3px 0 0;
+  margin: 4px 0 0;
   color: var(--color-muted);
   font-size: 12px;
 }
@@ -591,13 +610,13 @@ body {
 .dashboard-link-btn {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   background: var(--color-ivory-bg);
   color: var(--color-emerald-dark);
   border: 1px solid rgba(201, 162, 75, 0.45);
-  padding: 7px 12px;
+  padding: 8px 14px;
   border-radius: 10px;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
@@ -613,14 +632,14 @@ body {
 .dashboard-chart-legend {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .legend-item {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 11px;
   font-weight: 600;
   color: var(--color-muted);
@@ -646,13 +665,13 @@ body {
 }
 
 .dashboard-chart {
-  height: 215px;
+  height: 210px;
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
   align-items: end;
-  padding: 14px 12px 10px;
-  background: var(--color-ivory-bg);
+  padding: 16px 14px 12px;
+  background: #faf8f3;
   border-radius: 16px;
   border: 1px solid var(--color-border);
 }
@@ -674,8 +693,8 @@ body {
 
 .dashboard-chart-track {
   width: 100%;
-  max-width: 44px;
-  height: 130px;
+  max-width: 40px;
+  height: 124px;
   border-radius: 10px;
   background: rgba(6, 28, 43, 0.06);
   display: flex;
@@ -720,32 +739,35 @@ body {
 }
 
 .dashboard-chart-footer {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--color-border);
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(229, 222, 208, 0.7);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 12px;
 }
 
 .dashboard-chart-footer div {
-  background: var(--color-ivory-bg);
+  background: #faf8f3;
   border-radius: 12px;
-  padding: 10px 12px;
+  padding: 11px 14px;
   border: 1px solid var(--color-border);
 }
 
 .dashboard-chart-footer span {
   display: block;
   font-size: 11px;
+  font-weight: 600;
   color: var(--color-muted);
 }
 
 .dashboard-chart-footer strong {
   display: block;
-  margin-top: 2px;
+  margin-top: 4px;
   font-family: "Playfair Display", serif;
-  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  font-size: 19px;
+  font-weight: 700;
   color: var(--color-navy-deep);
 }
 
@@ -753,34 +775,38 @@ body {
 .dashboard-availability-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 14px;
 }
 
 .avail-stat-box {
-  border-radius: 14px;
-  padding: 12px;
+  border-radius: 13px;
+  padding: 12px 14px;
   border: 1px solid var(--color-border);
-  background: var(--color-ivory-bg);
+  background: #faf8f3;
 }
 
 .avail-stat-box span {
   display: block;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
   color: var(--color-muted);
 }
 
 .avail-stat-box strong {
   display: block;
   font-family: "Playfair Display", serif;
-  font-size: 24px;
-  margin: 2px 0;
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  font-weight: 700;
+  margin: 3px 0 2px;
   color: var(--color-navy-deep);
 }
 
 .avail-stat-box small {
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--color-muted);
 }
 
@@ -797,8 +823,8 @@ body {
 }
 
 .dashboard-occupancy-meter {
-  background: var(--color-ivory-bg);
-  padding: 10px 12px;
+  background: #faf8f3;
+  padding: 11px 14px;
   border-radius: 12px;
   border: 1px solid var(--color-border);
   margin-bottom: 14px;
@@ -808,7 +834,7 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 11px;
-  margin-bottom: 6px;
+  margin-bottom: 7px;
 }
 
 .occupancy-meter-labels span {
@@ -821,9 +847,9 @@ body {
 }
 
 .occupancy-meter-track {
-  height: 8px;
+  height: 7px;
   border-radius: 999px;
-  background: rgba(201, 162, 75, 0.25);
+  background: rgba(201, 162, 75, 0.22);
   overflow: hidden;
 }
 
@@ -840,20 +866,20 @@ body {
 .dashboard-room-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 225px;
+  gap: 9px;
+  max-height: 220px;
   overflow-y: auto;
-  padding-right: 2px;
+  padding-right: 4px;
 }
 
 .dashboard-room-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 9px 12px;
+  gap: 14px;
+  padding: 10px 14px;
   border-radius: 12px;
-  background: var(--color-ivory-bg);
+  background: #faf8f3;
   border: 1px solid var(--color-border);
 }
 
@@ -866,7 +892,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 .dashboard-room-title-line strong {
@@ -878,11 +904,11 @@ body {
 }
 
 .room-type-pill {
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
-  padding: 2px 7px;
+  padding: 2px 8px;
   border-radius: 999px;
-  background: rgba(6, 59, 50, 0.1);
+  background: rgba(6, 59, 50, 0.09);
   color: var(--color-emerald-dark);
 }
 
@@ -919,13 +945,13 @@ body {
 .dashboard-room-available,
 .dashboard-room-maintenance {
   border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 11px;
+  padding: 3.5px 10px;
+  font-size: 10.5px;
   font-weight: 700;
 }
 
 .dashboard-room-available {
-  background: rgba(6, 59, 50, 0.12);
+  background: rgba(6, 59, 50, 0.11);
   color: var(--color-emerald-dark);
 }
 
@@ -937,6 +963,8 @@ body {
 /* ================= RECENT BOOKINGS TABLE ================= */
 .dashboard-table-wrapper {
   overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
 }
 
 .dashboard-table {
@@ -946,20 +974,24 @@ body {
 
 .dashboard-table th,
 .dashboard-table td {
-  padding: 13px 12px;
+  padding: 13px 16px;
   text-align: left;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid rgba(229, 222, 208, 0.75);
   font-size: 13px;
   vertical-align: middle;
 }
 
+.dashboard-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
 .dashboard-table th {
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 10.5px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.9px;
   font-weight: 700;
-  background: var(--color-ivory-bg);
+  background: #faf8f3;
 }
 
 .dashboard-table th.text-right {
@@ -973,12 +1005,13 @@ body {
 .booking-id-badge {
   display: inline-block;
   font-weight: 700;
-  font-size: 12px;
+  font-size: 11.5px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   color: var(--color-emerald-dark);
   background: rgba(6, 59, 50, 0.08);
-  padding: 4px 9px;
+  padding: 4px 10px;
   border-radius: 8px;
-  border: 1px solid rgba(6, 59, 50, 0.15);
+  border: 1px solid rgba(6, 59, 50, 0.14);
 }
 
 .guest-cell strong,
@@ -993,17 +1026,17 @@ body {
   display: block;
   margin-top: 2px;
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 11.5px;
 }
 
 .dashboard-status {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 5px 11px;
+  padding: 4.5px 11px;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
 }
 
 .dashboard-status-pending {
@@ -1026,16 +1059,16 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
+  gap: 8px;
 }
 
 .table-action-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 10px;
+  gap: 5px;
+  padding: 6px 11px;
   border-radius: 8px;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
   cursor: pointer;
   border: 1px solid transparent;
@@ -1222,8 +1255,8 @@ body {
   }
 
   .dashboard-chart {
-    gap: 6px;
-    padding: 12px 8px;
+    gap: 8px;
+    padding: 12px 10px;
   }
 
   .dashboard-chart-footer,

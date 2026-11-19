@@ -66,6 +66,7 @@ function AppLayout() {
         <Route path="/admin/dashboard" element={<AdminDashboard activeSection="overview" />} />
         <Route path="/admin/bookings" element={<AdminDashboard activeSection="bookings" />} />
         <Route path="/admin/offers" element={<AdminDashboard activeSection="offers" />} />
+        <Route path="/admin/promo-codes" element={<AdminDashboard activeSection="promo-codes" />} />
         <Route path="/admin/rooms" element={<AdminDashboard activeSection="rooms" />} />
         <Route path="/admin/facilities" element={<AdminDashboard activeSection="facilities" />} />
         <Route path="/admin/gallery" element={<AdminDashboard activeSection="gallery" />} />

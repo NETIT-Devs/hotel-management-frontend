@@ -21,6 +21,12 @@ import {
   LogIn,
 } from 'lucide-react';
 import checkoutHeroImg from '../assets/checkoutPageHero.webp';
+import {
+  fetchMyFacilityReservations,
+  cancelMyFacilityReservation,
+} from '../services/facilityService';
+import { applyPageSEO } from '../utils/seo';
+import { evaluateChildPolicy } from '../utils/childPolicy';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -100,6 +106,10 @@ export default function MyBookingsPage() {
   const [cancelTarget, setCancelTarget] = useState(null);
   const [cancelling, setCancelling] = useState(false);
 
+  // Customer facility reservations & event inquiries state
+  const [facilityReservations, setFacilityReservations] = useState([]);
+  const [cancellingFacilityId, setCancellingFacilityId] = useState(null);
+
   const loadAccountData = async () => {
     const activeToken = localStorage.getItem('token');
     setToken(activeToken);
@@ -111,14 +121,16 @@ export default function MyBookingsPage() {
     setLoading(true);
     setError('');
     try {
-      const [bookingsRes, profileRes] = await Promise.all([
+      const [bookingsRes, profileRes, myFacilityList] = await Promise.all([
         fetch(`${API_BASE}/bookings/my-bookings`, {
           headers: { Authorization: `Bearer ${activeToken}` },
         }),
         fetch(`${API_BASE}/auth/profile`, {
           headers: { Authorization: `Bearer ${activeToken}` },
         }),
+        fetchMyFacilityReservations().catch(() => []),
       ]);
+      setFacilityReservations(myFacilityList);
 
       const bookingsData = await bookingsRes.json();
       if (bookingsRes.ok && Array.isArray(bookingsData.bookings)) {
@@ -153,7 +165,30 @@ export default function MyBookingsPage() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     loadAccountData();
+    return applyPageSEO({
+      title: 'My Bookings & Concierge Reservations',
+      description:
+        'View and manage your suite reservations, spa appointments, fine dining tables, and event inquiries at Serenity Bay Hotel & Resort.',
+      canonicalPath: '/my-bookings',
+    });
   }, []);
+
+  // Cancel a customer facility reservation and refresh list
+  const handleCancelFacilityReservation = async (reservationId) => {
+    setCancellingFacilityId(reservationId);
+    try {
+      await cancelMyFacilityReservation(reservationId);
+      setFacilityReservations((prev) =>
+        prev.map((item) =>
+          item.id === reservationId ? { ...item, status: 'CANCELLED' } : item
+        )
+      );
+    } catch (err) {
+      setError(err.message || 'Unable to cancel facility reservation.');
+    } finally {
+      setCancellingFacilityId(null);
+    }
+  };
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
@@ -530,6 +565,15 @@ export default function MyBookingsPage() {
                             <CreditCard className="w-3 h-3 text-[#C9A24B]" />
                             {b.payment_method === 'ONLINE' ? 'Online Payment' : 'Pay at Hotel'}
                           </span>
+                          {b.child_ages && (() => {
+                            const cp = evaluateChildPolicy({ childAges: b.child_ages, nights, residency: b.residency });
+                            if (!cp.agesDisplay) return null;
+                            return (
+                              <span className="bg-emerald-50 text-[#063B32] px-2.5 py-1 rounded-lg border border-emerald-200 font-semibold">
+                                Children ({cp.agesDisplay}){cp.housekeepingSummary ? ` · ${cp.housekeepingSummary}` : ''}
+                              </span>
+                            );
+                          })()}
                           {b.admin_note && (
                             <span className="text-amber-700 font-medium">Note: {b.admin_note}</span>
                           )}
@@ -578,6 +622,135 @@ export default function MyBookingsPage() {
             </div>
           )}
         </section>
+
+        {/* ================= FACILITY RESERVATIONS & EVENT INQUIRIES ================= */}
+        {token && (
+          <section className="space-y-4 pt-2" aria-label="Facility Reservations and Event Inquiries">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-[#063B32]">
+                  Spa, Dining &amp; Concierge Requests
+                </h2>
+                <p className="text-xs text-gray-500 font-light">
+                  Track your spa appointments, fine dining tables, yacht charters, and bespoke event proposals.
+                </p>
+              </div>
+              <Link
+                to="/facilities"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#C9A24B] hover:underline self-start sm:self-center"
+              >
+                <span>Explore Resort Facilities</span>
+                <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+              </Link>
+            </div>
+
+            {facilityReservations.length === 0 ? (
+              <div className="bg-white rounded-3xl p-8 text-center border border-[#C9A24B]/25 shadow-sm">
+                <Sparkles className="w-7 h-7 text-[#C9A24B] mx-auto mb-2" aria-hidden="true" />
+                <p className="font-serif text-lg text-[#063B32] mb-1">
+                  No Facility Reservations Yet
+                </p>
+                <p className="text-xs text-gray-500 mb-4 max-w-md mx-auto">
+                  Reserve an Ayurveda spa session, sunset dining table, or private yacht charter directly from our Facilities page.
+                </p>
+                <Link
+                  to="/facilities"
+                  className="inline-flex items-center gap-2 bg-[#063B32] text-[#C9A24B] px-5 py-2.5 rounded-xl text-xs font-bold hover:opacity-95 transition"
+                >
+                  <span>Browse Facilities</span>
+                  <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {facilityReservations.map((fr) => {
+                  const statusTone =
+                    fr.status === 'CONFIRMED'
+                      ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                      : fr.status === 'COMPLETED'
+                      ? 'bg-blue-100 text-blue-800 border-blue-200'
+                      : fr.status === 'CANCELLED'
+                      ? 'bg-red-100 text-red-700 border-red-200'
+                      : 'bg-amber-100 text-amber-800 border-amber-200';
+                  const canCancelFacility = fr.status === 'PENDING' || fr.status === 'CONFIRMED';
+
+                  return (
+                    <article
+                      key={fr.id}
+                      className="bg-white rounded-3xl overflow-hidden border border-[#C9A24B]/30 shadow-md flex flex-col justify-between"
+                    >
+                      <div className="p-5 sm:p-6 space-y-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="font-mono text-[11px] font-extrabold text-[#063B32] bg-[#FAF8F5] border border-[#C9A24B]/35 px-2.5 py-1 rounded-lg">
+                            {fr.reference_code}
+                          </span>
+                          <span
+                            className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${statusTone}`}
+                          >
+                            {fr.status}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#C9A24B] block">
+                            {fr.request_type === 'INQUIRY' ? 'EVENT PROPOSAL INQUIRY' : fr.facility_category}
+                          </span>
+                          <h3 className="font-serif text-xl font-semibold text-[#063B32] leading-snug">
+                            {fr.facility_title}
+                          </h3>
+                          {fr.service_option && (
+                            <p className="text-xs text-gray-600 font-medium mt-0.5">{fr.service_option}</p>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-100 text-xs">
+                          <div>
+                            <span className="text-[10px] uppercase tracking-wider text-gray-400 block">Date</span>
+                            <span className="font-semibold text-[#061C2B]">
+                              {formatDateLabel(fr.reservation_date)}
+                            </span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] uppercase tracking-wider text-gray-400 block">
+                              Time / Guests
+                            </span>
+                            <span className="font-semibold text-[#061C2B]">
+                              {fr.time_slot || 'Concierge Scheduled'} · {fr.guests_count}G
+                            </span>
+                          </div>
+                        </div>
+
+                        {fr.admin_notes && (
+                          <div className="bg-[#FAF8F5] border border-[#C9A24B]/25 rounded-xl px-3 py-2 text-[11px] text-[#063B32]">
+                            <span className="font-bold">Concierge Note:</span> {fr.admin_notes}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="px-5 sm:px-6 py-3.5 bg-[#FAF8F5] border-t border-[#C9A24B]/20 flex items-center justify-between gap-3">
+                        <span className="text-xs font-bold text-[#063B32]">
+                          {Number(fr.estimated_price) > 0
+                            ? `Est. $${Number(fr.estimated_price).toFixed(0)} (Pay at Venue)`
+                            : 'Custom Concierge Quote'}
+                        </span>
+                        {canCancelFacility && (
+                          <button
+                            type="button"
+                            disabled={cancellingFacilityId === fr.id}
+                            onClick={() => handleCancelFacilityReservation(fr.id)}
+                            className="text-xs font-bold text-red-600 hover:underline cursor-pointer disabled:opacity-50"
+                          >
+                            {cancellingFacilityId === fr.id ? 'Cancelling...' : 'Cancel Request'}
+                          </button>
+                        )}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+        )}
       </div>
 
       {/* ================= BOOKING RECEIPT / DETAILS MODAL ================= */}

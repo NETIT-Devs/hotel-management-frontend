@@ -4,6 +4,7 @@ import {
   CalendarCheck,
   BedDouble,
   Tags,
+  TicketPercent,
   Sparkles,
   Image as ImageIcon,
   Users,
@@ -34,6 +35,11 @@ const AdminSidebar = ({ isOpen, onClose, userRole = "ADMIN" }) => {
       name: "Offers",
       path: "/admin/offers",
       icon: Tags,
+    },
+    {
+      name: "Promo Codes",
+      path: "/admin/promo-codes",
+      icon: TicketPercent,
     },
     {
       name: "Facilities",

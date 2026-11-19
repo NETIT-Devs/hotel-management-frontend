@@ -8,6 +8,12 @@ import hotelLobbyImg from '../assets/hotelLobbyImg.webp';   // Thumbnail image f
 import securePaymentImg from '../assets/securePaymentImg.webp'; // Thumbnail image for "Online Payment" card
 import RoomsBanner from '../components/RoomsBanner';
 import { ROOMS_DATA } from '../constants/hotelData';
+import { applyPageSEO } from '../utils/seo';
+import {
+    CHILD_AGE_OPTIONS,
+    normalizeChildAges,
+    evaluateChildPolicy
+} from '../utils/childPolicy';
 
 /**
  * Amenity Icons Mapping Object for Dynamic Summary Display
@@ -66,11 +72,24 @@ export default function CheckoutPage() {
     const [checkOutDate, setCheckOutDate] = useState(defaultCheckOut);
     const [adults, setAdults] = useState(location.state?.adults || '2');
     const [children, setChildren] = useState(location.state?.children || '0');
+    const [childAges, setChildAges] = useState(() =>
+        normalizeChildAges(
+            location.state?.childAges || [],
+            Number(location.state?.children) || 0
+        )
+    );
     const [roomsCount, setRoomsCount] = useState(location.state?.roomsCount || '1');
     const [residency, setResidency] = useState(
         location.state?.residency === 'Resident' ? 'Resident' : 'Non-Resident'
     );
     const [guestIdNumber, setGuestIdNumber] = useState('');
+
+    // Promo Code State
+    const [promoInput, setPromoInput] = useState(location.state?.promoCode || '');
+    const [appliedPromo, setAppliedPromo] = useState(null);
+    const [promoDiscount, setPromoDiscount] = useState(0);
+    const [promoError, setPromoError] = useState('');
+    const [promoLoading, setPromoLoading] = useState(false);
 
     // Guest Information State
     const [firstName, setFirstName] = useState('');
@@ -113,23 +132,131 @@ export default function CheckoutPage() {
     const [summaryHeight, setSummaryHeight] = useState(null);
     const formRef = useRef(null);
 
-    // Calculate pricing details dynamically based on dates & residency (supports both Room and Offer objects)
+    // Calculate pricing details dynamically based on dates, residency & special offers
+    const parseMoney = (val) => {
+        if (val === undefined || val === null || val === '') return 0;
+        return Number(String(val).replace(/[^0-9.]/g, '')) || 0;
+    };
+
+    const offerOriginalNightly = parseMoney(room.originalPrice || room.original_price);
+    const offerDiscountedNightly = parseMoney(room.discountedPrice || room.discounted_price);
+    const isOfferBooking = Boolean(
+        offerDiscountedNightly > 0 && (offerOriginalNightly > 0 || room.discount)
+    );
+
     const rawPriceStr = String(room.price || room.discountedPrice || room.discounted_price || room.originalPrice || '280');
-    const nonResidentBase = Number(room.price_per_night) || Number(rawPriceStr.replace(/[^0-9.]/g, '')) || 280;
+    const nonResidentBase = Number(room.price_per_night) || parseMoney(rawPriceStr) || 280;
     const residentBase = Number(room.resident_price_per_night) > 0
         ? Number(room.resident_price_per_night)
         : Math.round(nonResidentBase * 0.75);
-    const basePriceNum = residency === 'Resident' && !room.discountedPrice ? residentBase : nonResidentBase;
+
+    const effectiveNightlyRate = isOfferBooking
+        ? offerDiscountedNightly
+        : residency === 'Resident'
+        ? residentBase
+        : nonResidentBase;
+
+    const regularNightlyRate =
+        isOfferBooking && offerOriginalNightly > offerDiscountedNightly
+            ? offerOriginalNightly
+            : effectiveNightlyRate;
+
     const checkInTime = new Date(checkInDate).getTime();
     const checkOutTime = new Date(checkOutDate).getTime();
     const nights = Math.max(1, Math.round((checkOutTime - checkInTime) / (1000 * 60 * 60 * 24)) || 1);
     const calculatedNights = nights;
-    const roomRateTotal = basePriceNum * nights * Number(roomsCount);
-    const taxesAndFees = Math.round(roomRateTotal * 0.15);
+    const roomsQty = Math.max(1, Number(roomsCount) || 1);
 
-    // Dynamic Offer Discount: Display discount ONLY if room explicitly carries an offer
-    const discount = room.discountAmount || 0;
-    const totalAmount = roomRateTotal + taxesAndFees - discount;
+    const regularStayTotal = Math.round(regularNightlyRate * nights * roomsQty * 100) / 100;
+    const roomRateTotal = Math.round(effectiveNightlyRate * nights * roomsQty * 100) / 100;
+    const discount =
+        isOfferBooking && regularStayTotal > roomRateTotal
+            ? Math.round((regularStayTotal - roomRateTotal) * 100) / 100
+            : Number(room.discountAmount) || 0;
+
+    // Evaluate real-world hotel Child Age & Bedding Policy using room-specific DB rates (supports $0 Family Suites)
+    const childrenNum = Number(children) || 0;
+    const childPolicy = evaluateChildPolicy({
+        childAges: childrenNum > 0 ? normalizeChildAges(childAges, childrenNum) : [],
+        nights,
+        residency,
+        childExtraBedPrice: room.child_extra_bed_price,
+        residentChildExtraBedPrice: room.resident_child_extra_bed_price,
+    });
+    const childSupplement = childPolicy.childSupplementTotal;
+    const staySubtotalWithBedding = Math.round((roomRateTotal + childSupplement) * 100) / 100;
+
+    const taxesAndFees = Math.round(staySubtotalWithBedding * 0.15);
+    const totalSavings = Math.round((discount + promoDiscount) * 100) / 100;
+    const totalAmount = Math.max(
+        0,
+        Math.round((staySubtotalWithBedding + taxesAndFees - promoDiscount) * 100) / 100
+    );
+
+    const validateCheckoutPromo = async (codeToCheck) => {
+        const clean = String(codeToCheck ?? promoInput).trim().toUpperCase();
+        if (!clean) {
+            setAppliedPromo(null);
+            setPromoDiscount(0);
+            setPromoError('');
+            return;
+        }
+        setPromoLoading(true);
+        setPromoError('');
+        try {
+            const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const res = await fetch(`${API_BASE}/promo-codes/validate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code: clean,
+                    subtotal: roomRateTotal,
+                    nights,
+                    roomId: Number(room.room_id || room.id) || 1,
+                    residency
+                })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.valid) {
+                setAppliedPromo(null);
+                setPromoDiscount(0);
+                setPromoError(data.message || 'Invalid promo code.');
+            } else {
+                setPromoInput(data.promo.code);
+                setAppliedPromo(data.promo);
+                setPromoDiscount(Number(data.discountAmount) || 0);
+                setPromoError('');
+            }
+        } catch {
+            setPromoError('Unable to validate promo code right now.');
+        } finally {
+            setPromoLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (location.state?.promoCode) {
+            validateCheckoutPromo(location.state.promoCode);
+        }
+    }, []);
+
+    // Synchronize document SEO metadata for the Checkout page
+    useEffect(() => {
+        return applyPageSEO({
+            title: isOfferBooking
+                ? `Checkout — ${room.offerTitle || room.title} (${room.discount || 'Special Offer'})`
+                : `Secure Checkout — ${room.title || 'Suite Reservation'}`,
+            description:
+                'Complete your luxury reservation at Serenity Bay Hotel & Resort with instant confirmation, best rate guarantee, and secure checkout.',
+            canonicalPath: '/checkout'
+        });
+    }, [isOfferBooking, room.offerTitle, room.title, room.discount]);
+
+    useEffect(() => {
+        if (appliedPromo?.code) {
+            validateCheckoutPromo(appliedPromo.code);
+        }
+    }, [roomRateTotal, nights, residency]);
 
     useEffect(() => {
         const syncSummaryHeight = () => {
@@ -188,8 +315,10 @@ export default function CheckoutPage() {
                 checkIn: checkInDate,
                 checkOut: checkOutDate,
                 adults: Number(adults) || 1,
-                children: Number(children) || 0,
-                guests: (Number(adults) || 1) + (Number(children) || 0),
+                children: childrenNum,
+                child_ages: childPolicy.normalizedAges,
+                child_supplement: childSupplement,
+                guests: (Number(adults) || 1) + childrenNum,
                 roomsCount: Number(roomsCount) || 1,
                 guest_first_name: firstName,
                 guest_last_name: lastName,
@@ -197,6 +326,9 @@ export default function CheckoutPage() {
                 guest_phone: phone ? `+94${phone}` : '',
                 residency,
                 guest_id_number: guestIdNumber,
+                promo_code: appliedPromo?.code || null,
+                offer_discount: discount,
+                discount_amount: totalSavings,
                 special_requests: specialRequests,
                 payment_method: paymentMethod === 'hotel' ? 'PAY_AT_HOTEL' : 'ONLINE',
                 total_price: totalAmount,
@@ -427,6 +559,56 @@ export default function CheckoutPage() {
                                         </div>
                                     </div>
 
+                                    {/* Child Ages & Bedding Policy Verification (Shown when Children > 0) */}
+                                    {childrenNum > 0 && (
+                                        <div className="mt-4 p-4 rounded-2xl bg-[#FAF8F5] border border-[#C9A24B]/35 space-y-2.5">
+                                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                                <span className="text-[11px] font-bold uppercase tracking-wider text-[#063B32]">
+                                                    Child Ages &amp; Bedding Policy
+                                                </span>
+                                                <span className="text-[10.5px] text-gray-500">
+                                                    0–2: Free Baby Cot · 3–5: Free Sharing ·{' '}
+                                                    {childPolicy.ratePerExtraBedNight === 0
+                                                        ? '6–11: Free Extra Bed (Family Suite)'
+                                                        : `6–11: +$${childPolicy.ratePerExtraBedNight}/night Extra Bed`}
+                                                </span>
+                                            </div>
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                                                {normalizeChildAges(childAges, childrenNum).map((ageVal, idx) => (
+                                                    <div key={idx}>
+                                                        <label
+                                                            htmlFor={`checkout-child-age-${idx}`}
+                                                            className="block text-[10px] font-semibold text-gray-500 mb-1"
+                                                        >
+                                                            Child {idx + 1} Age
+                                                        </label>
+                                                        <select
+                                                            id={`checkout-child-age-${idx}`}
+                                                            value={ageVal}
+                                                            onChange={(e) => {
+                                                                const next = normalizeChildAges(childAges, childrenNum);
+                                                                next[idx] = e.target.value;
+                                                                setChildAges(next);
+                                                            }}
+                                                            className="w-full bg-white border border-[#e5dfd4] rounded-xl px-2.5 py-2 text-xs font-semibold text-[#061C2B] focus:outline-none focus:border-[#C9A24B]"
+                                                        >
+                                                            {CHILD_AGE_OPTIONS.map((opt) => (
+                                                                <option key={opt} value={opt}>
+                                                                    {opt === 'Under 1' ? 'Under 1 yr' : `${opt} ${opt === '1' ? 'yr' : 'yrs'}`}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            {childPolicy.housekeepingSummary && (
+                                                <p className="text-[11px] font-semibold text-[#063B32]">
+                                                    Room Setup: {childPolicy.housekeepingSummary}
+                                                </p>
+                                            )}
+                                        </div>
+                                    )}
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                         <div>
                                             <label className="block text-xs font-medium text-gray-600 mb-1">Guest Residency *</label>
@@ -484,6 +666,7 @@ export default function CheckoutPage() {
                                             />
                                         </div>
                                     </div>
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                         <div>
                                             <label className="block text-xs font-medium text-gray-600 mb-1">Email Address *</label>
@@ -823,7 +1006,10 @@ export default function CheckoutPage() {
                                 {Number(children) > 0 && (
                                     <span className="flex items-center gap-1.5">
                                         <Users className="w-4 h-4 text-[#C9A24B] shrink-0" />
-                                        <span>{children} {Number(children) > 1 ? 'Children' : 'Child'}</span>
+                                        <span>
+                                            {children} {Number(children) > 1 ? 'Children' : 'Child'}
+                                            {childPolicy.agesDisplay ? ` (${childPolicy.agesDisplay})` : ''}
+                                        </span>
                                     </span>
                                 )}
                             </div>
@@ -859,29 +1045,152 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
-                        {/* Price Breakdown */}
-                        <div className="space-y-2 text-xs font-light text-gray-200 mb-4 pb-4 border-b border-white/10">
-                            <div className="flex justify-between">
-                                <span>Room Rate ({nights} nights)</span>
-                                <span className="font-medium">${roomRateTotal}.00</span>
+                        {/* Promo Code Input inside Booking Summary */}
+                        <div className="mb-4 pb-4 border-b border-white/10">
+                            <label className="block text-[10px] font-bold uppercase tracking-widest text-[#C9A24B] mb-2">
+                                Have a Promo Code?
+                            </label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={promoInput}
+                                    onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                                    placeholder="e.g. SERENITY20"
+                                    className="flex-1 bg-black/30 border border-white/15 rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-wider text-white placeholder-gray-400 focus:outline-none focus:border-[#C9A24B]"
+                                />
+                                {appliedPromo ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setAppliedPromo(null);
+                                            setPromoDiscount(0);
+                                            setPromoInput('');
+                                            setPromoError('');
+                                        }}
+                                        className="px-3 py-2 rounded-xl bg-red-500/20 border border-red-400/40 text-red-200 text-xs font-bold hover:bg-red-500/30 cursor-pointer"
+                                    >
+                                        Remove
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        disabled={promoLoading}
+                                        onClick={() => validateCheckoutPromo(promoInput)}
+                                        className="px-4 py-2 rounded-xl bg-[#C9A24B] text-[#061C2B] text-xs font-extrabold hover:bg-[#b58d35] transition cursor-pointer"
+                                    >
+                                        {promoLoading ? '...' : 'Apply'}
+                                    </button>
+                                )}
                             </div>
+                            {appliedPromo && (
+                                <p className="text-[11px] text-emerald-300 mt-1.5 font-medium flex items-center gap-1">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-[#C9A24B] shrink-0" />
+                                    <span>{appliedPromo.code} applied ({appliedPromo.title})</span>
+                                </p>
+                            )}
+                            {promoError && (
+                                <p className="text-[11px] text-red-300 mt-1.5 font-medium">
+                                    {promoError}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Special Offer Banner inside Summary */}
+                        {isOfferBooking && discount > 0 && (
+                            <div className="mb-4 p-3.5 rounded-xl bg-gradient-to-r from-[#C9A24B]/20 to-[#C9A24B]/10 border border-[#C9A24B]/50 flex items-center justify-between gap-3">
+                                <div>
+                                    <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#C9A24B] block">
+                                        SPECIAL OFFER APPLIED · {room.discount || 'EXCLUSIVE'}
+                                    </span>
+                                    <span className="text-xs text-white font-medium">
+                                        {room.offerTitle || room.title}
+                                    </span>
+                                </div>
+                                <div className="text-right shrink-0">
+                                    <span className="text-[11px] text-gray-300 line-through block">
+                                        ${regularNightlyRate.toFixed(0)}/night
+                                    </span>
+                                    <span className="font-serif text-base font-bold text-[#C9A24B]">
+                                        ${effectiveNightlyRate.toFixed(0)}/night
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Price Breakdown */}
+                        <div className="space-y-2.5 text-xs font-light text-gray-200 mb-4 pb-4 border-b border-white/10">
+                            {isOfferBooking && discount > 0 ? (
+                                <>
+                                    <div className="flex justify-between items-center text-gray-300">
+                                        <span>
+                                            Regular Rate ({nights} {nights === 1 ? 'night' : 'nights'} × ${regularNightlyRate.toFixed(0)})
+                                        </span>
+                                        <span className="line-through text-gray-400">
+                                            ${regularStayTotal.toFixed(2)}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[#C9A24B] font-semibold">
+                                        <span>
+                                            Offer Discount ({room.discount || 'Special Offer'})
+                                        </span>
+                                        <span>-${discount.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-white font-medium pt-1 border-t border-white/10">
+                                        <span>Discounted Room Subtotal</span>
+                                        <span>${roomRateTotal.toFixed(2)}</span>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="flex justify-between">
+                                    <span>Room Rate ({nights} {nights === 1 ? 'night' : 'nights'})</span>
+                                    <span className="font-medium">${roomRateTotal.toFixed(2)}</span>
+                                </div>
+                            )}
+
+                            {childrenNum > 0 && (
+                                <div className="flex justify-between items-center">
+                                    <span>
+                                        {childSupplement > 0
+                                            ? `Child Extra Bed (${childPolicy.olderChildCount} × $${childPolicy.ratePerExtraBedNight}/night)`
+                                            : childPolicy.olderChildCount > 0
+                                            ? 'Child Extra Bed (Kids Stay Free)'
+                                            : childPolicy.infantCount > 0
+                                            ? 'Infant Baby Cot & Bedding'
+                                            : 'Child Sharing Bedding'}
+                                    </span>
+                                    <span className={childSupplement > 0 ? 'font-medium text-white' : 'font-semibold text-emerald-300'}>
+                                        {childSupplement > 0 ? `+$${childSupplement.toFixed(2)}` : 'Complimentary'}
+                                    </span>
+                                </div>
+                            )}
+
                             <div className="flex justify-between">
-                                <span>Taxes &amp; Fees</span>
-                                <span className="font-medium">${taxesAndFees}.00</span>
+                                <span>Taxes &amp; Fees (15%)</span>
+                                <span className="font-medium">${taxesAndFees.toFixed(2)}</span>
                             </div>
 
-                            {discount > 0 && (
-                                <div className="flex justify-between text-[#C9A24B]">
-                                    <span>Offer Discount ({room.discountPercent || '15%'} OFF)</span>
-                                    <span className="font-medium">-${discount}.00</span>
+                            {promoDiscount > 0 && appliedPromo && (
+                                <div className="flex justify-between text-[#C9A24B] font-semibold">
+                                    <span>Promo Code ({appliedPromo.code})</span>
+                                    <span>-${promoDiscount.toFixed(2)}</span>
                                 </div>
                             )}
                         </div>
 
                         {/* Total Amount */}
-                        <div className="flex justify-between items-baseline mb-6">
-                            <span className="text-sm font-medium text-white">Total Amount</span>
-                            <span className="font-serif text-3xl font-normal text-[#C9A24B]">${totalAmount}.00</span>
+                        <div className="mb-6">
+                            <div className="flex justify-between items-baseline">
+                                <span className="text-sm font-medium text-white">Total Amount</span>
+                                <span className="font-serif text-3xl font-normal text-[#C9A24B]">
+                                    ${Number(totalAmount).toFixed(2)}
+                                </span>
+                            </div>
+                            {totalSavings > 0 && (
+                                <div className="mt-2 inline-flex items-center gap-1.5 bg-[#C9A24B]/15 border border-[#C9A24B]/40 text-[#C9A24B] px-3 py-1 rounded-full text-[11px] font-bold">
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                    <span>You save ${totalSavings.toFixed(2)} on this reservation!</span>
+                                </div>
+                            )}
                         </div>
 
                         {/* Free Cancellation Card */}

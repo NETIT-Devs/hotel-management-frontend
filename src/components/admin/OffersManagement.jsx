@@ -25,6 +25,7 @@ import {
   deleteOffer,
 } from "../../services/offerAdminService";
 import { getAllRoomsAdmin } from "../../services/roomAdminService";
+import ImageUploadField from "./ImageUploadField";
 
 const ROOM_OPTIONS = [
   { id: 1, name: "Deluxe Ocean Room" },
@@ -73,6 +74,7 @@ const OffersManagement = () => {
     category: "ROMANTIC ESCAPE",
     subtitle: "",
     description: "",
+    long_description: "",
     discount: "20% OFF",
     original_price: 250,
     discounted_price: 200,
@@ -139,6 +141,7 @@ const OffersManagement = () => {
       category: offer.category || "ROMANTIC ESCAPE",
       subtitle: offer.subtitle || "",
       description: offer.description || "",
+      long_description: offer.long_description || "",
       discount: offer.discount || "20% OFF",
       original_price: offer.original_price || 0,
       discounted_price: offer.discounted_price || 0,
@@ -1172,7 +1175,7 @@ const OffersManagement = () => {
             </div>
 
             <p style={{ fontSize: "12.5px", color: "#5B6964", lineHeight: 1.6 }}>
-              {viewOffer.description}
+              {viewOffer.long_description || viewOffer.description}
             </p>
 
             {Array.isArray(viewOffer.features) && viewOffer.features.length > 0 && (
@@ -1546,38 +1549,47 @@ const OffersManagement = () => {
                 </div>
               </div>
 
-              {/* Image URL */}
+              {/* Cover Image (Direct File Upload or Image URL) */}
+              <ImageUploadField
+                label="Offer Cover Image"
+                folder="offers"
+                value={formData.image_url}
+                onChange={(url) => setFormData((prev) => ({ ...prev, image_url: url }))}
+              />
+
+              {/* Short Description (Shown on Offer Cards & Previews) */}
               <div>
                 <label style={{ display: "block", fontSize: "11px", fontWeight: "700", color: "var(--color-muted)", marginBottom: "4px" }}>
-                  IMAGE URL
+                  SHORT DESCRIPTION (OFFER CARDS &amp; PREVIEWS)
                 </label>
-                <input
-                  type="url"
-                  name="image_url"
-                  value={formData.image_url}
+                <textarea
+                  name="description"
+                  rows="2"
+                  value={formData.description}
                   onChange={handleFormChange}
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="Concise 1-2 sentence summary displayed on offer cards..."
                   style={{
                     width: "100%",
                     padding: "8px 12px",
                     borderRadius: "8px",
                     border: "1px solid #D0D6D2",
-                    fontSize: "13px",
+                    fontSize: "12px",
+                    resize: "vertical",
                   }}
                 />
               </div>
 
-              {/* Description */}
+              {/* Long Detailed Description (Shown on Offer Details Page) */}
               <div>
                 <label style={{ display: "block", fontSize: "11px", fontWeight: "700", color: "var(--color-muted)", marginBottom: "4px" }}>
-                  DESCRIPTION
+                  DETAILED DESCRIPTION (OFFER DETAILS PAGE)
                 </label>
                 <textarea
-                  name="description"
-                  rows="3"
-                  value={formData.description}
+                  name="long_description"
+                  rows="4"
+                  value={formData.long_description}
                   onChange={handleFormChange}
-                  placeholder="Describe the offer experience, perks, and inclusions..."
+                  placeholder="Full editorial description displayed on the Offer Details page (perks, dining, spa & exclusive experience)..."
                   style={{
                     width: "100%",
                     padding: "8px 12px",
@@ -1750,37 +1762,18 @@ const OffersManagement = () => {
                         </div>
                       ))}
                     </div>
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <input
-                        type="url"
-                        value={newOfferImage}
-                        onChange={(e) => setNewOfferImage(e.target.value)}
-                        placeholder="Add gallery image URL..."
-                        style={{
-                          flex: 1,
-                          padding: "7px 10px",
-                          borderRadius: "8px",
-                          border: "1px solid #D0D6D2",
-                          fontSize: "12px",
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => addOfferListItem("images", newOfferImage, setNewOfferImage)}
-                        style={{
-                          padding: "7px 12px",
-                          borderRadius: "8px",
-                          border: "none",
-                          background: "var(--color-gold-luxury)",
-                          color: "var(--color-navy-deep)",
-                          fontWeight: 700,
-                          fontSize: "12px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Add
-                      </button>
-                    </div>
+                    <ImageUploadField
+                      mode="append"
+                      label="Add Offer Gallery Photo"
+                      folder="offers"
+                      placeholder="Paste gallery image URL..."
+                      onAddImage={(url) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          images: [...(prev.images || []), url],
+                        }))
+                      }
+                    />
                   </div>
                 </>
               )}

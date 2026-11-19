@@ -2,35 +2,107 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { OFFERS_DATA as staticOffers } from '../constants/hotelData';
 import { fetchLiveOffers } from '../services/publicHotelService';
+import { applyPageSEO } from '../utils/seo';
+import { parsePriceValue } from '../utils/offerPricing';
 import BookingBar from '../components/BookingBar';
-import { ArrowRight, Sparkles, Crown, Heart, CalendarDays, Clock } from 'lucide-react';
+import {
+    ArrowRight,
+    Sparkles,
+    Crown,
+    Heart,
+    CalendarDays,
+    Clock,
+    Users,
+    Sun,
+    Flower2,
+} from 'lucide-react';
 import RoomsBanner from '../components/RoomsBanner';
 
-// Import the exact hero background image from assets
+// Import the hero background image asset
 import offersHeroImg from '../assets/OffersPageHero.webp';
 
 /**
  * OffersPage Component
- * Displays exclusive hotel packages with reordered layout (Intro heading on top, Filter tabs below),
- * dynamic pricing, responsive white-themed card grid, and smooth navigation.
+ * Displays exclusive luxury hotel packages with category filters, dynamic live pricing,
+ * Schema.org Offer structured data (SEO), and direct routing to real-time availability checks.
  */
 function OffersPage() {
     const navigate = useNavigate();
     const [selectedTab, setSelectedTab] = useState('All Offers');
     const [offers, setOffers] = useState(staticOffers);
 
+    // Fetch live promotional offers from backend API (with graceful fallback to static offers)
     useEffect(() => {
         fetchLiveOffers().then((mapped) => {
             if (mapped?.length) setOffers(mapped);
         });
     }, []);
 
-    // Auto-filter offers dynamically based on the selected tab category.
+    // Apply page-level SEO metadata and Schema.org Offer catalog JSON-LD
+    useEffect(() => {
+        const offerItems = offers.map((item, idx) => ({
+            '@type': 'Offer',
+            position: idx + 1,
+            name: item.title,
+            description: item.description,
+            priceCurrency: 'USD',
+            price: parsePriceValue(item.discountedPrice) || undefined,
+            availability: 'https://schema.org/InStock',
+            url: typeof window !== 'undefined' ? `${window.location.origin}/offers/${item.id}` : undefined
+        }));
+
+        return applyPageSEO({
+            title: 'Exclusive Hotel Offers & Luxury Packages',
+            description:
+                'Explore curated luxury hotel deals, romantic escapes, early booking discounts, and extended stay packages at Serenity Bay Hotel & Resort.',
+            canonicalPath: '/offers',
+            jsonLd: {
+                '@context': 'https://schema.org',
+                '@type': 'ItemList',
+                name: 'Serenity Bay Hotel Special Offers',
+                itemListElement: offerItems
+            }
+        });
+    }, [offers]);
+
+    // Format category strings into clean Title Case and deduplicate case-insensitively
+    const toTitleCase = (str) =>
+        String(str || '')
+            .trim()
+            .toLowerCase()
+            .replace(/\b\w/g, (ch) => ch.toUpperCase());
+
+    const uniqueCategoryMap = new Map();
+    ['Romantic Escape', 'Long Stay', 'Early Booking'].forEach((cat) => {
+        uniqueCategoryMap.set(cat.toLowerCase(), cat);
+    });
+    offers.forEach((offer) => {
+        const clean = toTitleCase(offer.category);
+        if (clean && !uniqueCategoryMap.has(clean.toLowerCase())) {
+            uniqueCategoryMap.set(clean.toLowerCase(), clean);
+        }
+    });
+    const filterTabs = ['All Offers', ...Array.from(uniqueCategoryMap.values())];
+
+    // Map each offer category label to a tailored luxury Lucide icon
+    const getCategoryIcon = (label) => {
+        const lower = String(label || '').toLowerCase();
+        if (lower.includes('romantic')) return Heart;
+        if (lower.includes('long')) return CalendarDays;
+        if (lower.includes('early')) return Clock;
+        if (lower.includes('family')) return Users;
+        if (lower.includes('weekend')) return Sun;
+        if (lower.includes('wellness') || lower.includes('spa')) return Flower2;
+        if (lower.includes('vip') || lower.includes('luxury')) return Crown;
+        return Sparkles;
+    };
+
+    // Auto-filter offers dynamically based on the selected tab category
     const filteredOffers = selectedTab === 'All Offers'
         ? offers
-        : offers.filter(offer => offer.category.toLowerCase() === selectedTab.toLowerCase());
-
-    const filterTabs = ['All Offers', 'Romantic Escape', 'Long Stay', 'Early Booking'];
+        : offers.filter(
+            (offer) => (offer.category || '').trim().toLowerCase() === selectedTab.toLowerCase()
+        );
 
     return (
         <main className="min-h-screen bg-[#F8F5F0] text-[#18342d] overflow-x-hidden">
@@ -86,20 +158,11 @@ function OffersPage() {
                 </p>
             </section>
 
-            {/* ================= AUTO FILTER TABS SECTION (RESPONSIVE & AUTO-ADJUSTING) ================= */}
-            <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-12 text-center" aria-label="Offer Categories">
-                {/* 
-                  'flex flex-wrap' ensures that if new categories are added, 
-                  they automatically wrap and resize cleanly on both mobile and desktop screens.
-                */}
-                <div className="bg-[#FAF8F5] border border-[#C9A24B]/40 p-2 sm:p-3 rounded-2xl md:rounded-full shadow-md inline-flex flex-wrap justify-center items-center gap-2 sm:gap-2.5">
+            {/* ================= COMPACT LUXURY FILTER TABS (MATCHING FACILITIES STYLE) ================= */}
+            <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-10 text-center" aria-label="Offer Categories">
+                <div className="bg-[#FAF8F5] border border-[#C9A24B]/40 p-2 sm:p-2.5 rounded-2xl md:rounded-full shadow-md inline-flex flex-wrap justify-center items-center gap-1.5 sm:gap-2">
                     {filterTabs.map((tab) => {
-                        // Assigning appropriate Lucide icons automatically
-                        let IconComponent = Sparkles;
-                        if (tab === 'Romantic Escape') IconComponent = Heart;
-                        if (tab === 'Long Stay') IconComponent = CalendarDays;
-                        if (tab === 'Early Booking') IconComponent = Clock;
-
+                        const IconComponent = getCategoryIcon(tab);
                         const isSelected = selectedTab === tab;
 
                         return (
@@ -107,17 +170,20 @@ function OffersPage() {
                                 key={tab}
                                 type="button"
                                 onClick={() => setSelectedTab(tab)}
-                                className={`px-4 sm:px-6 py-2.5 rounded-full text-xs md:text-sm font-semibold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 ${isSelected
-                                    ? 'bg-[#C9A24B] text-white shadow-md scale-105 font-bold' // Active: Golden pill with crisp white text
-                                    : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent' // Inactive: Transparent with hover effect
-                                    }`}
+                                className={`px-3.5 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${
+                                    isSelected
+                                        ? 'bg-[#C9A24B] text-[#061C2B] shadow-md font-bold'
+                                        : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
+                                }`}
                                 aria-pressed={isSelected}
                             >
                                 <IconComponent
-                                    className={`w-4 h-4 transition-colors flex-shrink-0 ${isSelected ? 'text-white' : 'text-[#C9A24B]'
-                                        }`}
+                                    className={`w-3.5 h-3.5 transition-colors shrink-0 ${
+                                        isSelected ? 'text-[#061C2B]' : 'text-[#C9A24B]'
+                                    }`}
+                                    aria-hidden="true"
                                 />
-                                <span className="truncate">{tab}</span>
+                                <span>{tab}</span>
                             </button>
                         );
                     })}
@@ -213,18 +279,23 @@ function OffersPage() {
                                             <ArrowRight className="w-3.5 h-3.5" />
                                         </Link>
 
-                                        {/* Book Now Button */}
+                                        {/* Book Offer Button -> Routes to Real-Time Availability Check with Auto-Applied Offer */}
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                navigate('/checkout', { state: { room: offer } });
+                                                navigate(`/availability?offerId=${offer.id}`, {
+                                                    state: {
+                                                        selectedOffer: offer,
+                                                        selectedRoomId: offer.room_id || null
+                                                    }
+                                                });
                                                 window.scrollTo({ top: 0, behavior: 'smooth' });
                                             }}
                                             className="bg-gradient-to-r from-[#C9A24B] to-[#B38E38] text-[#063B32] hover:opacity-95 px-5 py-3 rounded-xl text-xs font-bold tracking-wider transition-all shadow-md flex items-center gap-2 cursor-pointer"
-                                            aria-label={`Book offer ${offer.title}`}
+                                            aria-label={`Check availability and book offer ${offer.title}`}
                                         >
                                             <span>Book Offer</span>
-                                            <ArrowRight className="w-3.5 h-3.5 text-[#063B32]" />
+                                            <ArrowRight className="w-3.5 h-3.5 text-[#063B32]" aria-hidden="true" />
                                         </button>
                                     </div>
                                 </div>

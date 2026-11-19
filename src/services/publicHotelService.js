@@ -28,6 +28,14 @@ export const mapRoomFromApi = (r) => {
   const galleryImages = safeArray(r.gallery_images, staticMatch.galleryImages || images.slice(0, 4));
   const priceNum = Number(r.price_per_night) || Number(String(staticMatch.price || '280').replace(/[^0-9.]/g, '')) || 280;
   const residentPriceNum = Number(r.resident_price_per_night) > 0 ? Number(r.resident_price_per_night) : Math.round(priceNum * 0.75);
+  const childExtraBedNum =
+    r.child_extra_bed_price !== null && r.child_extra_bed_price !== undefined && r.child_extra_bed_price !== ''
+      ? Math.max(0, Number(r.child_extra_bed_price))
+      : 25;
+  const residentChildExtraBedNum =
+    r.resident_child_extra_bed_price !== null && r.resident_child_extra_bed_price !== undefined && r.resident_child_extra_bed_price !== ''
+      ? Math.max(0, Number(r.resident_child_extra_bed_price))
+      : 15;
   const sizeNum = Number(r.size_sqm) || 45;
   const cap = Number(r.capacity) || 2;
 
@@ -44,6 +52,8 @@ export const mapRoomFromApi = (r) => {
     priceNumber: priceNum,
     price_per_night: priceNum,
     resident_price_per_night: residentPriceNum,
+    child_extra_bed_price: childExtraBedNum,
+    resident_child_extra_bed_price: residentChildExtraBedNum,
     view: r.view_type || staticMatch.view || 'Ocean View',
     description: r.description || staticMatch.description || '',
     longDescription: r.long_description || staticMatch.longDescription || r.description || '',
@@ -80,6 +90,7 @@ export const mapOfferFromApi = (o) => {
     title: o.title || staticMatch.title || 'Special Offer',
     subtitle: o.subtitle || staticMatch.subtitle || 'Experience bespoke coastal luxury.',
     description: o.description || staticMatch.description || '',
+    longDescription: o.long_description || staticMatch.longDescription || o.description || staticMatch.description || '',
     discount: o.discount || staticMatch.discount || 'SPECIAL OFFER',
     originalPrice: origNum > 0 ? `$${Math.round(origNum)}` : staticMatch.originalPrice || '$250',
     discountedPrice: discNum > 0 ? `$${Math.round(discNum)}` : staticMatch.discountedPrice || '$200',

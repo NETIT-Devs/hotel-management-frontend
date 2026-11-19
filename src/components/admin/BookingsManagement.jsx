@@ -33,6 +33,7 @@ import {
   deleteBooking,
 } from "../../services/bookingAdminService";
 import { getAllRoomsAdmin } from "../../services/roomAdminService";
+import { evaluateChildPolicy } from "../../utils/childPolicy";
 
 const DEFAULT_ROOM_OPTIONS = [
   { id: 1, name: "Deluxe Ocean Room", price: 280 },
@@ -1502,6 +1503,44 @@ const BookingsManagement = () => {
                 </strong>
               </div>
             </div>
+
+            {/* Front Desk & Housekeeping Child Bedding Brief (Shown when Child Ages exist) */}
+            {viewBooking.child_ages && (() => {
+              const cp = evaluateChildPolicy({
+                childAges: viewBooking.child_ages,
+                nights: Math.max(
+                  1,
+                  Math.round(
+                    (new Date(viewBooking.check_out) - new Date(viewBooking.check_in)) /
+                      (1000 * 60 * 60 * 24)
+                  ) || 1
+                ),
+                residency: viewBooking.residency,
+              });
+              if (!cp.agesDisplay) return null;
+              return (
+                <div
+                  style={{
+                    background: "rgba(6, 59, 50, 0.06)",
+                    padding: "11px 14px",
+                    borderRadius: "12px",
+                    border: "1px solid rgba(6, 59, 50, 0.18)",
+                    marginBottom: "12px",
+                    fontSize: "12px",
+                  }}
+                >
+                  <strong style={{ display: "block", marginBottom: "4px", color: "#063B32" }}>
+                    Housekeeping Child Bedding Brief (Ages: {cp.agesDisplay})
+                  </strong>
+                  <span style={{ color: "#374151", display: "block" }}>
+                    Prepare: {cp.housekeepingSummary || "Standard bedding"}
+                    {Number(viewBooking.child_supplement) > 0
+                      ? ` · Extra Bed Supplement: $${Number(viewBooking.child_supplement).toFixed(2)}`
+                      : " · Complimentary"}
+                  </span>
+                </div>
+              );
+            })()}
 
             {viewBooking.special_requests && (
               <div

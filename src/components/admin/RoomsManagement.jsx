@@ -25,6 +25,7 @@ import {
   updateRoomStatus,
   deleteRoom,
 } from "../../services/roomAdminService";
+import ImageUploadField from "./ImageUploadField";
 
 const ROOM_TYPES = ["ALL", "DELUXE", "SUITE", "FAMILY", "STANDARD"];
 
@@ -84,6 +85,8 @@ const RoomsManagement = () => {
     amenities: ["Free Wi-Fi", "Air Conditioning"],
     price_per_night: 280,
     resident_price_per_night: 210,
+    child_extra_bed_price: 25,
+    resident_child_extra_bed_price: 15,
     capacity: 2,
     bed_type: "King Bed",
     size_sqm: 45,
@@ -153,6 +156,14 @@ const RoomsManagement = () => {
       price_per_night: Number(room.price_per_night) || 280,
       resident_price_per_night:
         Number(room.resident_price_per_night) || Math.round((Number(room.price_per_night) || 280) * 0.75),
+      child_extra_bed_price:
+        room.child_extra_bed_price !== null && room.child_extra_bed_price !== undefined
+          ? Number(room.child_extra_bed_price)
+          : 25,
+      resident_child_extra_bed_price:
+        room.resident_child_extra_bed_price !== null && room.resident_child_extra_bed_price !== undefined
+          ? Number(room.resident_child_extra_bed_price)
+          : 15,
       capacity: Number(room.capacity) || 2,
       bed_type: room.bed_type || "King Bed",
       size_sqm: Number(room.size_sqm) || 45,
@@ -644,6 +655,15 @@ const RoomsManagement = () => {
             const resPrice =
               Number(room.resident_price_per_night) ||
               Math.round(nonResPrice * 0.75);
+            const childBedIntl =
+              room.child_extra_bed_price !== null && room.child_extra_bed_price !== undefined
+                ? Number(room.child_extra_bed_price)
+                : 25;
+            const childBedRes =
+              room.resident_child_extra_bed_price !== null && room.resident_child_extra_bed_price !== undefined
+                ? Number(room.resident_child_extra_bed_price)
+                : 15;
+            const isKidsStayFree = childBedIntl === 0 && childBedRes === 0;
             const amenitiesList = Array.isArray(room.amenities)
               ? room.amenities
               : [];
@@ -875,6 +895,33 @@ const RoomsManagement = () => {
                           / night
                         </small>
                       </div>
+                    </div>
+
+                    {/* Per-Room Child Extra Bed Rate (Ages 6–11) Indicator */}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: "8px",
+                        padding: "8px 12px",
+                        borderRadius: "10px",
+                        marginBottom: "14px",
+                        fontSize: "11px",
+                        fontWeight: 700,
+                        background: isKidsStayFree ? "rgba(6, 59, 50, 0.08)" : "#FAF8F4",
+                        border: isKidsStayFree
+                          ? "1px solid rgba(6, 59, 50, 0.25)"
+                          : "1px solid rgba(201, 162, 75, 0.35)",
+                        color: isKidsStayFree ? "#063B32" : "#5B6964",
+                      }}
+                    >
+                      <span>Child Extra Bed (6–11 yrs)</span>
+                      <span style={{ color: isKidsStayFree ? "#063B32" : "#061C2B" }}>
+                        {isKidsStayFree
+                          ? "Kids Stay Free ($0)"
+                          : `+$${childBedIntl.toFixed(0)} Intl · +$${childBedRes.toFixed(0)} NIC / night`}
+                      </span>
                     </div>
 
                     <p
@@ -1703,6 +1750,86 @@ const RoomsManagement = () => {
                 </div>
               </div>
 
+              {/* Per-Room Child Extra Bed Pricing (Ages 6–11 · Supports $0 for Family Suites) */}
+              <div
+                style={{
+                  background: "#FAF8F4",
+                  border: "1px solid rgba(201, 162, 75, 0.4)",
+                  borderRadius: "12px",
+                  padding: "12px 14px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    gap: "6px",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <span style={{ fontSize: "11px", fontWeight: 800, color: "#063B32", textTransform: "uppercase", letterSpacing: "0.6px" }}>
+                    Child Extra Rollaway Bed Rates (Ages 6–11)
+                  </span>
+                  <span style={{ fontSize: "10.5px", color: "#5B6964", fontWeight: 600 }}>
+                    0–5 yrs always free · Set $0 for Family Suites (Kids Stay Free)
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(2, 1fr)",
+                    gap: "12px",
+                  }}
+                >
+                  <div>
+                    <label style={{ fontSize: "11px", fontWeight: 700, display: "block", marginBottom: "5px", color: "#061C2B" }}>
+                      Non-Resident Extra Bed ($ / night) *
+                    </label>
+                    <input
+                      type="number"
+                      name="child_extra_bed_price"
+                      min="0"
+                      step="1"
+                      value={formData.child_extra_bed_price}
+                      onChange={handleFormChange}
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "9px 12px",
+                        borderRadius: "8px",
+                        border: "1px solid #DCE2DC",
+                        background: "#FFFFFF",
+                        fontSize: "13px",
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "11px", fontWeight: 700, display: "block", marginBottom: "5px", color: "#063B32" }}>
+                      Resident Extra Bed — NIC ($ / night) *
+                    </label>
+                    <input
+                      type="number"
+                      name="resident_child_extra_bed_price"
+                      min="0"
+                      step="1"
+                      value={formData.resident_child_extra_bed_price}
+                      onChange={handleFormChange}
+                      required
+                      style={{
+                        width: "100%",
+                        padding: "9px 12px",
+                        borderRadius: "8px",
+                        border: "1px solid #DCE2DC",
+                        background: "#FFFFFF",
+                        fontSize: "13px",
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div
                 style={{
                   display: "grid",
@@ -1944,25 +2071,12 @@ const RoomsManagement = () => {
 
               {modalTab === "media" && (
                 <>
-                  <div>
-                    <label style={{ fontSize: "11px", fontWeight: 700, display: "block", marginBottom: "5px" }}>
-                      Primary Cover Image URL *
-                    </label>
-                    <input
-                      type="url"
-                      name="image_url"
-                      value={formData.image_url}
-                      onChange={handleFormChange}
-                      placeholder="https://images.unsplash.com/..."
-                      style={{
-                        width: "100%",
-                        padding: "9px 12px",
-                        borderRadius: "8px",
-                        border: "1px solid #DCE2DC",
-                        fontSize: "13px",
-                      }}
-                    />
-                  </div>
+                  <ImageUploadField
+                    label="Primary Cover Image *"
+                    folder="rooms"
+                    value={formData.image_url}
+                    onChange={(url) => setFormData((prev) => ({ ...prev, image_url: url }))}
+                  />
 
                   <div>
                     <label style={{ fontSize: "11px", fontWeight: 700, display: "block", marginBottom: "5px" }}>
@@ -2014,37 +2128,18 @@ const RoomsManagement = () => {
                         </div>
                       ))}
                     </div>
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <input
-                        type="url"
-                        value={newImageUrl}
-                        onChange={(e) => setNewImageUrl(e.target.value)}
-                        placeholder="Add slider image URL..."
-                        style={{
-                          flex: 1,
-                          padding: "7px 10px",
-                          borderRadius: "8px",
-                          border: "1px solid #DCE2DC",
-                          fontSize: "12px",
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => addListItem("images", newImageUrl, setNewImageUrl)}
-                        style={{
-                          padding: "7px 12px",
-                          borderRadius: "8px",
-                          border: "none",
-                          background: "var(--color-gold-luxury)",
-                          color: "var(--color-navy-deep)",
-                          fontWeight: 700,
-                          fontSize: "12px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Add
-                      </button>
-                    </div>
+                    <ImageUploadField
+                      mode="append"
+                      label="Add Slider Image"
+                      folder="rooms"
+                      placeholder="Paste slider image URL..."
+                      onAddImage={(url) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          images: [...(prev.images || []), url],
+                        }))
+                      }
+                    />
                   </div>
 
                   <div>
@@ -2077,37 +2172,18 @@ const RoomsManagement = () => {
                         </div>
                       ))}
                     </div>
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <input
-                        type="url"
-                        value={newGalleryUrl}
-                        onChange={(e) => setNewGalleryUrl(e.target.value)}
-                        placeholder="Add gallery image URL..."
-                        style={{
-                          flex: 1,
-                          padding: "7px 10px",
-                          borderRadius: "8px",
-                          border: "1px solid #DCE2DC",
-                          fontSize: "12px",
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => addListItem("gallery_images", newGalleryUrl, setNewGalleryUrl)}
-                        style={{
-                          padding: "7px 12px",
-                          borderRadius: "8px",
-                          border: "none",
-                          background: "var(--color-gold-luxury)",
-                          color: "var(--color-navy-deep)",
-                          fontWeight: 700,
-                          fontSize: "12px",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Add
-                      </button>
-                    </div>
+                    <ImageUploadField
+                      mode="append"
+                      label="Add Gallery Showcase Photo"
+                      folder="rooms"
+                      placeholder="Paste gallery showcase image URL..."
+                      onAddImage={(url) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          gallery_images: [...(prev.gallery_images || []), url],
+                        }))
+                      }
+                    />
                   </div>
                 </>
               )}

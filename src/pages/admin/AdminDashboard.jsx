@@ -5,6 +5,7 @@ import AdminSidebar from "../../components/admin/AdminSidebar";
 import DashboardOverview from "../../components/admin/DashboardOverview";
 import BookingsManagement from "../../components/admin/BookingsManagement";
 import OffersManagement from "../../components/admin/OffersManagement";
+import PromoCodesManagement from "../../components/admin/PromoCodesManagement";
 import RoomsManagement from "../../components/admin/RoomsManagement";
 import AdminManagement from "../../components/admin/AdminManagement";
 import FacilitiesManagement from "../../components/admin/FacilitiesManagement";
@@ -24,6 +25,8 @@ const AdminDashboard = ({ activeSection = "overview" }) => {
         return "Bookings & Reservations";
       case "offers":
         return "Special Offers Management";
+      case "promo-codes":
+        return "Promo Codes & Vouchers";
       case "rooms":
         return "Rooms & Suites Management";
       case "facilities":
@@ -43,6 +46,8 @@ const AdminDashboard = ({ activeSection = "overview" }) => {
         return <BookingsManagement />;
       case "offers":
         return <OffersManagement />;
+      case "promo-codes":
+        return <PromoCodesManagement />;
       case "rooms":
         return <RoomsManagement />;
       case "facilities":
