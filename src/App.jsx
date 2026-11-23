@@ -11,6 +11,7 @@ import AvailabilityPage from './pages/AvailabilityPage';
 import GalleryPage from './pages/GalleryPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import AuthPage from './pages/AuthPage';
+import AboutPage from './pages/AboutPage';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -60,6 +61,9 @@ function AppLayout() {
 
         {/* Authentication (Sign In & Register) Page Route */}
         <Route path="/auth" element={<AuthPage />} />
+
+        {/* About Us Page Route */}
+        <Route path="/about" element={<AboutPage />} />
 
         {/* Admin & Super Admin Dashboard Routes */}
         <Route path="/dashboard" element={<AdminDashboard activeSection="overview" />} />

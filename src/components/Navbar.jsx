@@ -129,6 +129,9 @@ export default function Navbar() {
                         } else if (link.label === "Gallery") {
                             linkHref = "/gallery";
                         }
+                        else if (link.label === "About Us") {
+                            linkHref = "/about";
+                        }
 
                         return (
                             <Link
@@ -239,6 +242,9 @@ export default function Navbar() {
                             mobileLinkHref = "/offers";
                         } else if (link.label === "Gallery") {
                             mobileLinkHref = "/gallery";
+                        }
+                        else if (link.label === "About Us") {
+                            mobileLinkHref = "/about";
                         }
 
                         return (
