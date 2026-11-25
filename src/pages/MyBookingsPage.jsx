@@ -280,17 +280,21 @@ export default function MyBookingsPage() {
     <main className="min-h-screen bg-[#F8F5F0] text-[#061C2B] overflow-x-hidden">
       {/* ================= HERO HEADER ================= */}
       <header
-        className="relative h-[320px] md:h-[380px] bg-cover bg-center flex flex-col justify-center px-6 pt-20 md:px-12 md:pt-24"
+        className="relative h-[450px] md:h-[600px] bg-cover bg-center flex flex-col justify-center px-6 pt-20 md:px-12 md:pt-28"
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.92) 0%, rgba(6, 59, 50, 0.65) 55%, rgba(6, 59, 50, 0.25) 100%), url(${checkoutHeroImg})`,
+          backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${checkoutHeroImg})`,
         }}
       >
-        <div className="max-w-7xl mx-auto w-full text-left">
+        <div className="max-w-7xl mx-auto w-full text-left animate-[fadeInUp_1s_ease-out]">
           <span className="text-[#C9A24B] tracking-[0.25em] uppercase text-xs font-bold block mb-2">
             SERENITY BAY GUEST PORTAL
           </span>
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-white font-normal mb-2">
-            {token ? `Welcome back, ${displayName}` : 'My Reservations & Guest Portal'}
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-normal mb-3 md:mb-4">
+            {token ? (
+              <>Welcome back,<br /><span className="italic text-[#C9A24B]">{displayName}</span></>
+            ) : (
+              <>My <span className="italic text-[#C9A24B]">Reservations</span> &amp; Guest Portal</>
+            )}
           </h1>
           <p className="text-gray-200 text-xs sm:text-sm font-light max-w-xl leading-relaxed">
             View your upcoming coastal escapes, check confirmation status, manage guest details, or review your reservation receipts.
@@ -453,11 +457,10 @@ export default function MyBookingsPage() {
                     key={tab.key}
                     type="button"
                     onClick={() => setStatusFilter(tab.key)}
-                    className={`px-4 py-2 rounded-full text-xs font-bold transition cursor-pointer ${
-                      statusFilter === tab.key
+                    className={`px-4 py-2 rounded-full text-xs font-bold transition cursor-pointer ${statusFilter === tab.key
                         ? 'bg-[#063B32] text-[#C9A24B] shadow-sm'
                         : 'bg-white text-gray-600 border border-gray-200 hover:border-[#C9A24B]'
-                    }`}
+                      }`}
                   >
                     {tab.label}
                   </button>
@@ -668,10 +671,10 @@ export default function MyBookingsPage() {
                     fr.status === 'CONFIRMED'
                       ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
                       : fr.status === 'COMPLETED'
-                      ? 'bg-blue-100 text-blue-800 border-blue-200'
-                      : fr.status === 'CANCELLED'
-                      ? 'bg-red-100 text-red-700 border-red-200'
-                      : 'bg-amber-100 text-amber-800 border-amber-200';
+                        ? 'bg-blue-100 text-blue-800 border-blue-200'
+                        : fr.status === 'CANCELLED'
+                          ? 'bg-red-100 text-red-700 border-red-200'
+                          : 'bg-amber-100 text-amber-800 border-amber-200';
                   const canCancelFacility = fr.status === 'PENDING' || fr.status === 'CONFIRMED';
 
                   return (
@@ -907,6 +910,18 @@ export default function MyBookingsPage() {
           </div>
         </div>
       )}
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </main>
   );
 }

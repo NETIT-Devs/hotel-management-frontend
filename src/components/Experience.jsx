@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Star } from 'lucide-react';
 import experienceBg from '../assets/experience-bg.webp';
 
@@ -29,9 +30,13 @@ export default function Experience() {
                     <p className="text-gray-200 text-xs md:text-sm font-light leading-relaxed mb-6 max-w-md">
                         Nestled along the pristine coastline, Serenity Bay Hotel & Resort offers a perfect blend of natural beauty, modern elegance and warm hospitality. Our mission is to create unforgettable experiences for every guest.
                     </p>
-                    <button className="bg-[#b8972e] text-black px-6 py-3 rounded-lg text-xs font-medium hover:bg-[#a68525] transition duration-300 inline-flex items-center gap-2 shadow-sm w-fit">
+                    <Link
+                        to="/about"
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        className="bg-[#b8972e] text-black px-6 py-3 rounded-lg text-xs font-medium hover:bg-[#a68525] transition duration-300 inline-flex items-center gap-2 shadow-sm w-fit cursor-pointer"
+                    >
                         Learn More <ArrowRight className="w-4 h-4" />
-                    </button>
+                    </Link>
                 </div>
 
                 {/* Right Side: 2x2 Stats Grid (Balanced layout without vertical stretching) */}

@@ -260,10 +260,10 @@ export default function FacilitiesPage() {
         selectedTab === 'ALL'
             ? facilities
             : facilities.filter((f) =>
-                  String(f.category || '')
-                      .toUpperCase()
-                      .includes(selectedTab)
-              );
+                String(f.category || '')
+                    .toUpperCase()
+                    .includes(selectedTab)
+            );
 
     return (
         <main className="min-h-screen bg-[#F8F5F0] text-[#061C2B] overflow-x-hidden">
@@ -281,7 +281,7 @@ export default function FacilitiesPage() {
                         WORLD-CLASS AMENITIES &amp; CONCIERGE
                     </span>
                     <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-normal mb-3 md:mb-4">
-                        Luxury Resort Facilities
+                        Luxury Resort <span className="italic text-[#C9A24B]">Facilities</span>
                     </h1>
                     <p className="text-gray-200 text-xs sm:text-sm md:text-base font-light max-w-xl leading-relaxed">
                         Enjoy complimentary coastal sanctuaries, reserve private Ayurveda spa rituals or cliffside dining tables, or request a bespoke event proposal with our 24/7 concierge.
@@ -296,7 +296,7 @@ export default function FacilitiesPage() {
 
             {/* ================= INTRO & 3-TIER ACCESS GUIDE ================= */}
             <section
-                className="max-w-6xl mx-auto px-4 sm:px-6 pt-2 pb-8 text-center"
+                className="max-w-6xl mx-auto px-4 sm:px-6 pt-6 pb-8 text-center"
                 aria-label="Resort Facilities Overview"
             >
                 <div className="flex items-center justify-center gap-3 mb-3">
@@ -373,11 +373,10 @@ export default function FacilitiesPage() {
                                 type="button"
                                 onClick={() => setSelectedTab(match)}
                                 aria-pressed={active}
-                                className={`px-3 xl:px-4 py-2 rounded-full text-[11px] xl:text-xs font-semibold tracking-wide transition-all duration-300 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
-                                    active
+                                className={`px-3 xl:px-4 py-2 rounded-full text-[11px] xl:text-xs font-semibold tracking-wide transition-all duration-300 cursor-pointer flex items-center gap-1.5 whitespace-nowrap shrink-0 ${active
                                         ? 'bg-[#C9A24B] text-[#061C2B] shadow-md font-bold'
                                         : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
-                                }`}
+                                    }`}
                             >
                                 <IconComp
                                     className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-[#061C2B]' : 'text-[#C9A24B]'}`}
@@ -441,11 +440,10 @@ export default function FacilitiesPage() {
                                             </span>
 
                                             <span
-                                                className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase shadow-md ${
-                                                    isMaintenance
+                                                className={`absolute top-4 right-4 px-3 py-1.5 rounded-full text-[10px] font-extrabold tracking-wider uppercase shadow-md ${isMaintenance
                                                         ? 'bg-amber-500 text-white'
                                                         : 'bg-[#C9A24B] text-[#061C2B]'
-                                                }`}
+                                                    }`}
                                             >
                                                 {isMaintenance ? 'MAINTENANCE' : facility.badge || 'AVAILABLE DAILY'}
                                             </span>
@@ -466,19 +464,18 @@ export default function FacilitiesPage() {
                                         <div className="p-5 sm:p-7">
                                             <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
                                                 <span
-                                                    className={`text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md ${
-                                                        bookingType === 'COMPLIMENTARY'
+                                                    className={`text-[10px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md ${bookingType === 'COMPLIMENTARY'
                                                             ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                                                             : bookingType === 'INQUIRY'
-                                                            ? 'bg-[#063B32]/10 text-[#063B32] border border-[#063B32]/20'
-                                                            : 'bg-[#C9A24B]/15 text-[#8a6a1f] border border-[#C9A24B]/35'
-                                                    }`}
+                                                                ? 'bg-[#063B32]/10 text-[#063B32] border border-[#063B32]/20'
+                                                                : 'bg-[#C9A24B]/15 text-[#8a6a1f] border border-[#C9A24B]/35'
+                                                        }`}
                                                 >
                                                     {bookingType === 'COMPLIMENTARY'
                                                         ? 'Complimentary Walk-In'
                                                         : bookingType === 'INQUIRY'
-                                                        ? 'Bespoke Event Proposal'
-                                                        : 'Reservation Recommended'}
+                                                            ? 'Bespoke Event Proposal'
+                                                            : 'Reservation Recommended'}
                                                 </span>
                                                 <span className="text-xs font-bold text-[#063B32]">
                                                     {facility.price_label || 'Complimentary'}
@@ -593,6 +590,19 @@ export default function FacilitiesPage() {
                     onClose={() => setActiveModalFacility(null)}
                 />
             )}
+
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `}</style>
         </main>
     );
 }

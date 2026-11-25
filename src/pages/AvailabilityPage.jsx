@@ -387,19 +387,23 @@ export default function AvailabilityPage() {
     // Resolve the display name of the offer's linked suite (from live rooms or offer metadata)
     const activeOfferRoomLabel =
         (isExclusiveRoomOffer && selectedRoomItem?.title) || activeOffer?.room_name || '';
+    const availabilityHeroTitle = activeOffer?.title || 'Check Live Room Availability';
+    const availabilityHeroTitleParts = availabilityHeroTitle.trim().split(/\s+/);
+    const availabilityHeroAccent = availabilityHeroTitleParts.pop();
+    const availabilityHeroTitlePrefix = availabilityHeroTitleParts.join(' ');
 
     return (
         <main className="min-h-screen bg-[#F8F5F0] text-[#061C2B] overflow-x-hidden">
             {/* ================= HERO BANNER ================= */}
             <header
-                className="relative h-[380px] sm:h-[420px] md:h-[500px] bg-cover bg-center flex flex-col justify-center px-5 pt-20 md:px-12 md:pt-28"
+                className="relative h-[450px] md:h-[600px] bg-cover bg-center flex flex-col justify-center px-6 pt-20 md:px-12 md:pt-28"
                 style={{
-                    backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.9) 0%, rgba(6, 59, 50, 0.6) 50%, rgba(6, 59, 50, 0.2) 90%), url(${roomsHeroImg})`
+                    backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${roomsHeroImg})`
                 }}
                 role="banner"
                 aria-label="Live Room Availability Header"
             >
-                <div className="max-w-7xl mx-auto w-full text-left animate-[fadeInUp_0.8s_ease-out]">
+                <div className="max-w-7xl mx-auto w-full text-left animate-[fadeInUp_1s_ease-out]">
                     {activeOffer && (
                         <Link
                             to={`/offers/${activeOffer.id}`}
@@ -413,8 +417,18 @@ export default function AvailabilityPage() {
                     <span className="text-[#C9A24B] tracking-[0.25em] uppercase text-[11px] sm:text-xs font-bold block mb-2">
                         {activeOffer ? `SPECIAL OFFER · ${activeOffer.discount}` : 'REAL-TIME RESERVATION ENGINE'}
                     </span>
-                    <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl text-white font-normal mb-3">
-                        {activeOffer ? activeOffer.title : 'Check Live Room Availability'}
+                    <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-normal mb-3 md:mb-4">
+                        {activeOffer ? (
+                            <>
+                                {availabilityHeroTitlePrefix}{availabilityHeroTitlePrefix && ' '}
+                                <span className="italic text-[#C9A24B]">{availabilityHeroAccent}</span>
+                            </>
+                        ) : (
+                            <>
+                                Check Live<br />
+                                Room <span className="italic text-[#C9A24B]">Availability</span>
+                            </>
+                        )}
                     </h1>
                     <p className="text-gray-200 text-xs sm:text-sm md:text-base font-light max-w-xl leading-relaxed">
                         {isExclusiveRoomOffer
@@ -1310,6 +1324,18 @@ export default function AvailabilityPage() {
             </section>
 
             <RoomsBanner />
+            <style>{`
+                @keyframes fadeInUp {
+                    from {
+                        opacity: 0;
+                        transform: translateY(20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `}</style>
         </main>
     );
 }

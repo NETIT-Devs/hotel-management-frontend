@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, ArrowRight } from 'lucide-react';
 import { FaFacebookF, FaInstagram, FaYoutube, FaXTwitter } from 'react-icons/fa6';
 import logoImg from '../assets/logo.png'; // Monogram Logo Asset
@@ -57,7 +58,7 @@ export default function Footer() {
                         <ul className="space-y-3">
                             <li><a href="#about" className="hover:text-[#b8972e] transition duration-300">About Us</a></li>
                             <li><a href="#gallery" className="hover:text-[#b8972e] transition duration-300">Gallery</a></li>
-                            <li><a href="#contact" className="hover:text-[#b8972e] transition duration-300">Contact</a></li>
+                            <li><Link to="/contact" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-[#b8972e] transition duration-300">Contact</Link></li>
                             <li><a href="#faqs" className="hover:text-[#b8972e] transition duration-300">FAQs</a></li>
                         </ul>
                     </div>

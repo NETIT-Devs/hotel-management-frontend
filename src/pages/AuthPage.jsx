@@ -149,13 +149,9 @@ export default function AuthPage() {
                     localStorage.setItem('user', JSON.stringify(data.user));
                 }
                 window.dispatchEvent(new Event('authChange'));
-                if (isAdmin) {
-                    setTimeout(() => {
-                        navigate('/admin/dashboard');
-                    }, 600);
-                } else {
-                    setTimeout(() => { navigate('/'); }, 1000);
-                }
+                setTimeout(() => {
+                    navigate('/');
+                }, isAdmin ? 600 : 1000);
             } else if (currentView === 'register') {
                 setSuccessMsg('Account created successfully! Please sign in.');
                 setCurrentView('login');

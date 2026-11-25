@@ -240,7 +240,7 @@ export default function GalleryPage() {
             VISUAL JOURNEY · SERENITY BAY
           </span>
           <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-normal mb-3 md:mb-4">
-            Resort Photo Gallery
+            Resort Photo <span className="italic text-[#C9A24B]">Gallery</span>
           </h1>
           <p className="text-gray-200 text-xs sm:text-sm md:text-base font-light max-w-xl leading-relaxed mb-5">
             Step inside our oceanfront sanctuary. Explore sun-drenched private pool villas, twilight dining terraces, and tranquil coastal moments.
@@ -294,16 +294,14 @@ export default function GalleryPage() {
                   setActiveCategory(cat);
                   setVisibleCount(PAGE_SIZE);
                 }}
-                className={`px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-semibold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap ${
-                  active
+                className={`px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-semibold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap ${active
                     ? 'bg-gradient-to-r from-[#C9A24B] to-[#b49147] text-[#061C2B] shadow-md font-bold'
                     : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
-                }`}
+                  }`}
               >
                 <CatIcon
-                  className={`w-4 h-4 transition-colors shrink-0 ${
-                    active ? 'text-[#061C2B]' : 'text-[#C9A24B]'
-                  }`}
+                  className={`w-4 h-4 transition-colors shrink-0 ${active ? 'text-[#061C2B]' : 'text-[#C9A24B]'
+                    }`}
                   aria-hidden="true"
                 />
                 <span>{cat}</span>
@@ -531,6 +529,18 @@ export default function GalleryPage() {
           </div>
         </div>
       )}
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </main>
   );
 }

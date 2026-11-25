@@ -1,5 +1,6 @@
 import React from 'react';
 import { Play } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import BookingBar from './BookingBar';
 import heroImg from '../assets/homeHero.webp'; // Optimized WebP asset
 
@@ -32,7 +33,7 @@ export default function Hero() {
 
                     {/* Primary H1 Heading for SEO & Brand Impact */}
                     <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-light mb-3 leading-tight drop-shadow-lg">
-                        Luxury Redefined<br />by the Ocean
+                        Luxury Redefined<br />by the <span className="italic text-[#C9A24B]">Ocean</span>
                     </h1>
 
                     {/* Descriptive Tagline */}
@@ -41,16 +42,16 @@ export default function Hero() {
                     </p>
 
                     {/* Brand Story Action Button */}
-                    <button
-                        type="button"
+                    <Link
+                        to="/about"
                         className="flex items-center gap-3 text-sm font-medium tracking-wider text-white hover:text-[#C5A253] transition focus:outline-none group cursor-pointer"
-                        aria-label="Watch our brand story video"
+                        aria-label="Learn about our brand story"
                     >
                         <span className="w-10 h-10 rounded-full border border-white/80 flex items-center justify-center bg-black/40 backdrop-blur-sm group-hover:border-[#C5A253] transition shadow-md">
                             <Play className="w-4 h-4 fill-current ml-0.5 text-white group-hover:text-[#C5A253] transition" />
                         </span>
                         Watch Our Story
-                    </button>
+                    </Link>
                 </div>
 
             </section>

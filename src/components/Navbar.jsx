@@ -4,6 +4,20 @@ import { Search, Calendar, Menu, X, User, LogIn, LogOut } from 'lucide-react';
 import { NAV_LINKS } from '../constants/hotelData';
 import logoImg from '../assets/logo.png'; // Monogram Logo Asset
 
+// Resolve navigation label to its corresponding router path
+const resolveNavPath = (link) => {
+    const routeMap = {
+        Home: '/',
+        'Rooms & Suites': '/rooms',
+        Facilities: '/facilities',
+        Offers: '/offers',
+        Gallery: '/gallery',
+        'About Us': '/about',
+        Contact: '/contact',
+    };
+    return routeMap[link.label] || link.href || '/';
+};
+
 /**
  * Navbar Component
  * Features:
@@ -115,35 +129,16 @@ export default function Navbar() {
 
                 {/* Desktop Navigation Link Items with Smooth Scroll to Top */}
                 <div className="hidden lg:flex items-center gap-8 text-sm font-light text-white">
-                    {NAV_LINKS.map((link, idx) => {
-                        // Intelligent path assignment for router navigation
-                        let linkHref = link.href || "/";
-                        if (link.label === "Home") {
-                            linkHref = "/";
-                        } else if (link.label === "Rooms & Suites") {
-                            linkHref = "/rooms";
-                        } else if (link.label === "Facilities") {
-                            linkHref = "/facilities";
-                        } else if (link.label === "Offers") {
-                            linkHref = "/offers";
-                        } else if (link.label === "Gallery") {
-                            linkHref = "/gallery";
-                        }
-                        else if (link.label === "About Us") {
-                            linkHref = "/about";
-                        }
-
-                        return (
-                            <Link
-                                key={idx}
-                                to={linkHref}
-                                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                                className="hover:text-[#b8972e] transition duration-300 tracking-wide font-normal"
-                            >
-                                {link.label}
-                            </Link>
-                        );
-                    })}
+                    {NAV_LINKS.map((link, idx) => (
+                        <Link
+                            key={idx}
+                            to={resolveNavPath(link)}
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                            className="hover:text-[#b8972e] transition duration-300 tracking-wide font-normal"
+                        >
+                            {link.label}
+                        </Link>
+                    ))}
                 </div>
 
                 {/* Header Actions (Search Modal, Sign-In Auth Trigger & Primary CTA Button) */}
@@ -160,14 +155,15 @@ export default function Navbar() {
                     {user ? (
                         <div className="hidden sm:flex items-center gap-2">
                             {['ADMIN', 'SUPER_ADMIN'].includes(user.role) && (
-                                <Link
-                                    to="/admin/dashboard"
-                                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                                <a
+                                    href={import.meta.env.VITE_ADMIN_URL || "http://localhost:5174/admin/dashboard"}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="bg-[#C9A24B]/20 text-[#b8972e] border border-[#b8972e]/70 px-3 py-2 rounded-lg text-xs font-bold hover:bg-[#C9A24B] hover:text-[#061C2B] transition shadow-sm"
-                                    title="Open Admin Dashboard"
+                                    title="Open Standalone Admin Dashboard"
                                 >
                                     Dashboard
-                                </Link>
+                                </a>
                             )}
                             <Link
                                 to="/my-bookings"
@@ -230,37 +226,19 @@ export default function Navbar() {
 
                 {/* Mobile Navigation Links with Smooth Scroll to Top */}
                 <div className="flex flex-col gap-6 text-center">
-                    {NAV_LINKS.map((link, idx) => {
-                        let mobileLinkHref = link.href || "/";
-                        if (link.label === "Home") {
-                            mobileLinkHref = "/";
-                        } else if (link.label === "Rooms & Suites") {
-                            mobileLinkHref = "/rooms";
-                        } else if (link.label === "Facilities") {
-                            mobileLinkHref = "/facilities";
-                        } else if (link.label === "Offers") {
-                            mobileLinkHref = "/offers";
-                        } else if (link.label === "Gallery") {
-                            mobileLinkHref = "/gallery";
-                        }
-                        else if (link.label === "About Us") {
-                            mobileLinkHref = "/about";
-                        }
-
-                        return (
-                            <Link
-                                key={idx}
-                                to={mobileLinkHref}
-                                onClick={() => {
-                                    setIsOpen(false);
-                                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                                }}
-                                className="text-lg font-serif tracking-wider text-white hover:text-[#b8972e] transition duration-300 border-b border-white/10 pb-3"
-                            >
-                                {link.label}
-                            </Link>
-                        );
-                    })}
+                    {NAV_LINKS.map((link, idx) => (
+                        <Link
+                            key={idx}
+                            to={resolveNavPath(link)}
+                            onClick={() => {
+                                setIsOpen(false);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                            className="text-lg font-serif tracking-wider text-white hover:text-[#b8972e] transition duration-300 border-b border-white/10 pb-3"
+                        >
+                            {link.label}
+                        </Link>
+                    ))}
                 </div>
 
                 {/* Mobile Actions: Sign In Link & Booking CTA */}

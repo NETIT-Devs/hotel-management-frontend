@@ -133,7 +133,7 @@ export default function RoomsPage() {
                     </span>
                     <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-normal mb-3 md:mb-4">
                         Discover Our<br />
-                        Rooms &amp; Suites
+                        Rooms &amp; <span className="italic text-[#C9A24B]">Suites</span>
                     </h1>
                     <p className="text-gray-200 text-xs sm:text-sm md:text-base font-light max-w-xl leading-relaxed">
                         Elegant spaces, breathtaking views, unforgettable stays.<br />

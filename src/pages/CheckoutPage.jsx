@@ -153,8 +153,8 @@ export default function CheckoutPage() {
     const effectiveNightlyRate = isOfferBooking
         ? offerDiscountedNightly
         : residency === 'Resident'
-        ? residentBase
-        : nonResidentBase;
+            ? residentBase
+            : nonResidentBase;
 
     const regularNightlyRate =
         isOfferBooking && offerOriginalNightly > offerDiscountedNightly
@@ -375,17 +375,17 @@ export default function CheckoutPage() {
 
             {/* Hero Banner Section with Local Asset Image & Smooth Fade-In Animation */}
             <header
-                className="relative h-[420px] md:h-[550px] bg-cover bg-center flex flex-col justify-center px-6 pt-20 md:px-12 md:pt-28"
+                className="relative h-[450px] md:h-[600px] bg-cover bg-center flex flex-col justify-center px-6 pt-20 md:px-12 md:pt-28"
                 style={{
-                    backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.88) 0%, rgba(6, 59, 50, 0.5) 40%, rgba(6, 59, 50, 0.15) 70%, rgba(6, 59, 50, 0) 90%), url(${checkoutHeroImg})`
+                    backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${checkoutHeroImg})`
                 }}
             >
                 <div className="max-w-7xl mx-auto w-full text-left animate-[fadeInUp_1s_ease-out]">
                     <span className="text-[#C5A253] tracking-[0.2em] uppercase text-xs font-bold block mb-2">
                         HOME &gt; ROOMS &amp; SUITES &gt; BOOKING
                     </span>
-                    <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-white font-normal mb-3">
-                        Reserve Your Stay
+                    <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-normal mb-3 md:mb-4">
+                        Reserve Your <span className="italic text-[#C9A24B]">Stay</span>
                     </h1>
                     <p className="text-gray-200 text-xs sm:text-sm md:text-base font-light max-w-xl leading-relaxed">
                         Your dream escape is just a few steps away.<br />
@@ -1153,10 +1153,10 @@ export default function CheckoutPage() {
                                         {childSupplement > 0
                                             ? `Child Extra Bed (${childPolicy.olderChildCount} × $${childPolicy.ratePerExtraBedNight}/night)`
                                             : childPolicy.olderChildCount > 0
-                                            ? 'Child Extra Bed (Kids Stay Free)'
-                                            : childPolicy.infantCount > 0
-                                            ? 'Infant Baby Cot & Bedding'
-                                            : 'Child Sharing Bedding'}
+                                                ? 'Child Extra Bed (Kids Stay Free)'
+                                                : childPolicy.infantCount > 0
+                                                    ? 'Infant Baby Cot & Bedding'
+                                                    : 'Child Sharing Bedding'}
                                     </span>
                                     <span className={childSupplement > 0 ? 'font-medium text-white' : 'font-semibold text-emerald-300'}>
                                         {childSupplement > 0 ? `+$${childSupplement.toFixed(2)}` : 'Complimentary'}

@@ -205,6 +205,9 @@ export default function OfferDetailsPage() {
     const imageList = offer.images && offer.images.length > 0
         ? offer.images
         : [offer.image || 'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1400&q=85'];
+    const offerTitleParts = offer.title.trim().split(/\s+/);
+    const highlightedOfferTitleWord = offerTitleParts.pop();
+    const offerTitlePrefix = offerTitleParts.join(' ');
 
     const handlePrevImage = () => {
         setActiveImageIndex((prev) => (prev === 0 ? imageList.length - 1 : prev - 1));
@@ -238,7 +241,8 @@ export default function OfferDetailsPage() {
                         EXCLUSIVE OFFERS / {offer.category}
                     </span>
                     <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-normal mb-3 md:mb-4">
-                        {offer.title}
+                        {offerTitlePrefix}{offerTitlePrefix && ' '}
+                        <span className="italic text-[#C9A24B]">{highlightedOfferTitleWord}</span>
                     </h1>
                     <p className="text-gray-200 text-xs sm:text-sm md:text-base font-light max-w-xl leading-relaxed">
                         {offer.subtitle || 'Create unforgettable moments together at Serenity Bay Resort.'}
@@ -519,8 +523,8 @@ export default function OfferDetailsPage() {
                                 aria-label="Previous offers"
                                 disabled={!otherOffersScroll.left}
                                 className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all ${otherOffersScroll.left
-                                        ? 'border-[#C9A24B]/50 text-[#C9A24B] hover:border-[#C9A24B] hover:bg-[#C9A24B] hover:text-[#063B32]'
-                                        : 'cursor-not-allowed border-white/20 text-white/30 opacity-50'
+                                    ? 'border-[#C9A24B]/50 text-[#C9A24B] hover:border-[#C9A24B] hover:bg-[#C9A24B] hover:text-[#063B32]'
+                                    : 'cursor-not-allowed border-white/20 text-white/30 opacity-50'
                                     }`}
                             >
                                 <ChevronLeft className="h-5 w-5" />
@@ -531,8 +535,8 @@ export default function OfferDetailsPage() {
                                 aria-label="Next offers"
                                 disabled={!otherOffersScroll.right}
                                 className={`flex h-10 w-10 items-center justify-center rounded-full border transition-all ${otherOffersScroll.right
-                                        ? 'border-[#C9A24B]/50 text-[#C9A24B] hover:border-[#C9A24B] hover:bg-[#C9A24B] hover:text-[#063B32]'
-                                        : 'cursor-not-allowed border-white/20 text-white/30 opacity-50'
+                                    ? 'border-[#C9A24B]/50 text-[#C9A24B] hover:border-[#C9A24B] hover:bg-[#C9A24B] hover:text-[#063B32]'
+                                    : 'cursor-not-allowed border-white/20 text-white/30 opacity-50'
                                     }`}
                             >
                                 <ChevronRight className="h-5 w-5" />

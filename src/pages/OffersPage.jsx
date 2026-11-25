@@ -121,7 +121,7 @@ function OffersPage() {
                         EXCLUSIVE EXPERIENCES
                     </span>
                     <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white font-normal mb-3 md:mb-4">
-                        Exclusive Offers
+                        Exclusive <span className="italic text-[#C9A24B]">Offers</span>
                     </h1>
                     <p className="text-gray-200 text-xs sm:text-sm md:text-base font-light max-w-xl leading-relaxed">
                         Discover thoughtfully curated offers and make your next<br className="hidden sm:block" />
@@ -170,17 +170,15 @@ function OffersPage() {
                                 key={tab}
                                 type="button"
                                 onClick={() => setSelectedTab(tab)}
-                                className={`px-3.5 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${
-                                    isSelected
+                                className={`px-3.5 sm:px-5 py-2 rounded-full text-xs font-semibold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 ${isSelected
                                         ? 'bg-[#C9A24B] text-[#061C2B] shadow-md font-bold'
                                         : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
-                                }`}
+                                    }`}
                                 aria-pressed={isSelected}
                             >
                                 <IconComponent
-                                    className={`w-3.5 h-3.5 transition-colors shrink-0 ${
-                                        isSelected ? 'text-[#061C2B]' : 'text-[#C9A24B]'
-                                    }`}
+                                    className={`w-3.5 h-3.5 transition-colors shrink-0 ${isSelected ? 'text-[#061C2B]' : 'text-[#C9A24B]'
+                                        }`}
                                     aria-hidden="true"
                                 />
                                 <span>{tab}</span>

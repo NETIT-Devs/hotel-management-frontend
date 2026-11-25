@@ -62,6 +62,9 @@ const RoomDetailsPage = () => {
 
   // Find the selected room from data or fallback to first room
   const room = roomsList.find((r) => r.id === parseInt(id)) || roomsList[0];
+  const roomTitleParts = room.title.trim().split(/\s+/);
+  const highlightedTitleWord = roomTitleParts.pop();
+  const roomTitlePrefix = roomTitleParts.join(' ');
 
   // Filter similar rooms for recommendations (excluding current room)
   const similarRooms = roomsList.filter((r) => r.id !== room.id);
@@ -172,7 +175,8 @@ const RoomDetailsPage = () => {
           </nav>
 
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-white font-light tracking-wide mb-3 leading-tight drop-shadow-lg">
-            {room.title}
+            {roomTitlePrefix}{roomTitlePrefix && ' '}
+            <span className="italic text-[#C9A24B]">{highlightedTitleWord}</span>
           </h1>
           <p className="text-gray-100 text-sm md:text-base font-light max-w-xl leading-relaxed drop-shadow-md">
             {room.description}
@@ -344,8 +348,8 @@ const RoomDetailsPage = () => {
               <button
                 onClick={() => setActiveTab('overview')}
                 className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-[11px] sm:text-xs font-semibold tracking-wider transition-all cursor-pointer ${activeTab === 'overview'
-                    ? 'bg-gradient-to-r from-[#C9A24B] to-[#B38E38] text-white shadow-md font-bold'
-                    : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
+                  ? 'bg-gradient-to-r from-[#C9A24B] to-[#B38E38] text-white shadow-md font-bold'
+                  : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
                   }`}
               >
                 <Info className={`w-3.5 h-3.5 shrink-0 transition-colors ${activeTab === 'overview' ? 'text-white' : 'text-[#C9A24B]'}`} />
@@ -355,8 +359,8 @@ const RoomDetailsPage = () => {
               <button
                 onClick={() => setActiveTab('amenities')}
                 className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-[11px] sm:text-xs font-semibold tracking-wider transition-all cursor-pointer ${activeTab === 'amenities'
-                    ? 'bg-gradient-to-r from-[#C9A24B] to-[#B38E38] text-white shadow-md font-bold'
-                    : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
+                  ? 'bg-gradient-to-r from-[#C9A24B] to-[#B38E38] text-white shadow-md font-bold'
+                  : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
                   }`}
               >
                 <Sparkles className={`w-3.5 h-3.5 shrink-0 transition-colors ${activeTab === 'amenities' ? 'text-white' : 'text-[#C9A24B]'}`} />
@@ -366,8 +370,8 @@ const RoomDetailsPage = () => {
               <button
                 onClick={() => setActiveTab('gallery')}
                 className={`flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-6 py-2.5 rounded-xl sm:rounded-full text-[11px] sm:text-xs font-semibold tracking-wider transition-all cursor-pointer ${activeTab === 'gallery'
-                    ? 'bg-gradient-to-r from-[#C9A24B] to-[#B38E38] text-white shadow-md font-bold'
-                    : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
+                  ? 'bg-gradient-to-r from-[#C9A24B] to-[#B38E38] text-white shadow-md font-bold'
+                  : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
                   }`}
               >
                 <Grid className={`w-3.5 h-3.5 shrink-0 transition-colors ${activeTab === 'gallery' ? 'text-white' : 'text-[#C9A24B]'}`} />

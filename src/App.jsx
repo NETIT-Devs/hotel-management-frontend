@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import RoomsPage from './pages/RoomsPage';
 import RoomDetailsPage from './pages/RoomDetailsPage';
@@ -12,20 +12,15 @@ import GalleryPage from './pages/GalleryPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import AuthPage from './pages/AuthPage';
 import AboutPage from './pages/AboutPage';
-import AdminDashboard from './pages/admin/AdminDashboard';
+import ContactPage from './pages/ContactPage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
 function AppLayout() {
-  const location = useLocation();
-  const isAdminRoute =
-    location.pathname.startsWith('/admin') ||
-    location.pathname.startsWith('/dashboard');
-
   return (
     <div className="w-full bg-[#F2EFE9] min-h-screen text-gray-800">
-      {/* Global Navigation Bar (hidden on Admin Dashboard routes) */}
-      {!isAdminRoute && <Navbar />}
+      {/* Global Navigation Bar */}
+      <Navbar />
 
       <Routes>
         {/* Home Page Route */}
@@ -65,21 +60,12 @@ function AppLayout() {
         {/* About Us Page Route */}
         <Route path="/about" element={<AboutPage />} />
 
-        {/* Admin & Super Admin Dashboard Routes */}
-        <Route path="/dashboard" element={<AdminDashboard activeSection="overview" />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard activeSection="overview" />} />
-        <Route path="/admin/bookings" element={<AdminDashboard activeSection="bookings" />} />
-        <Route path="/admin/offers" element={<AdminDashboard activeSection="offers" />} />
-        <Route path="/admin/promo-codes" element={<AdminDashboard activeSection="promo-codes" />} />
-        <Route path="/admin/rooms" element={<AdminDashboard activeSection="rooms" />} />
-        <Route path="/admin/facilities" element={<AdminDashboard activeSection="facilities" />} />
-        <Route path="/admin/gallery" element={<AdminDashboard activeSection="gallery" />} />
-        <Route path="/admin/management" element={<AdminDashboard activeSection="management" />} />
-        <Route path="/admin/*" element={<AdminDashboard activeSection="overview" />} />
+        {/* Contact & Concierge Page Route */}
+        <Route path="/contact" element={<ContactPage />} />
       </Routes>
 
-      {/* Global Footer (hidden on Admin Dashboard routes) */}
-      {!isAdminRoute && <Footer />}
+      {/* Global Footer */}
+      <Footer />
     </div>
   );
 }
