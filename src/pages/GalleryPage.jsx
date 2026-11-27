@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import RoomsBanner from '../components/RoomsBanner';
 import { applyPageSEO } from '../utils/seo';
-import galleryHeroImg from '../assets/OffersPageHero.webp';
+import galleryPageHero from '../assets/galleryPageHero.webp';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -230,7 +230,7 @@ export default function GalleryPage() {
       <header
         className="relative h-[450px] md:h-[600px] bg-cover bg-center flex flex-col justify-center px-6 pt-20 md:px-12 md:pt-28"
         style={{
-          backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${galleryHeroImg})`,
+          backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${galleryPageHero})`,
         }}
         role="banner"
         aria-label="Resort Photo Gallery Header"
@@ -295,8 +295,8 @@ export default function GalleryPage() {
                   setVisibleCount(PAGE_SIZE);
                 }}
                 className={`px-5 sm:px-6 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-semibold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 whitespace-nowrap ${active
-                    ? 'bg-gradient-to-r from-[#C9A24B] to-[#b49147] text-[#061C2B] shadow-md font-bold'
-                    : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
+                  ? 'bg-gradient-to-r from-[#C9A24B] to-[#b49147] text-[#061C2B] shadow-md font-bold'
+                  : 'text-[#063B32] hover:bg-[#C9A24B]/15 bg-transparent'
                   }`}
               >
                 <CatIcon

@@ -33,7 +33,7 @@ import {
 } from '../utils/childPolicy';
 import { applyPageSEO } from '../utils/seo';
 import RoomsBanner from '../components/RoomsBanner';
-import roomsHeroImg from '../assets/roomsPageHero.webp';
+import availabilityPageHero from '../assets/availabilityPageHero.webp';
 
 /**
  * AvailabilityPage Component
@@ -398,7 +398,7 @@ export default function AvailabilityPage() {
             <header
                 className="relative h-[450px] md:h-[600px] bg-cover bg-center flex flex-col justify-center px-6 pt-20 md:px-12 md:pt-28"
                 style={{
-                    backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${roomsHeroImg})`
+                    backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${availabilityPageHero})`
                 }}
                 role="banner"
                 aria-label="Live Room Availability Header"
@@ -434,8 +434,8 @@ export default function AvailabilityPage() {
                         {isExclusiveRoomOffer
                             ? 'Step 2 of 3: Choose your check-in and check-out dates below to verify live availability for your offer suite and proceed to checkout.'
                             : activeOffer
-                            ? 'Step 2 of 3: Choose your dates below and select any eligible suite — your exclusive offer discount is already applied.'
-                            : 'Select your preferred check-in and check-out dates to view real-time suite inventory, instant total stay rates, and reserve your coastal sanctuary.'}
+                                ? 'Step 2 of 3: Choose your dates below and select any eligible suite — your exclusive offer discount is already applied.'
+                                : 'Select your preferred check-in and check-out dates to view real-time suite inventory, instant total stay rates, and reserve your coastal sanctuary.'}
                     </p>
                 </div>
             </header>
@@ -500,11 +500,10 @@ export default function AvailabilityPage() {
                                     type="button"
                                     onClick={() => setResidency('Non-Resident')}
                                     aria-pressed={residency === 'Non-Resident'}
-                                    className={`flex-1 sm:flex-none px-3 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition cursor-pointer ${
-                                        residency === 'Non-Resident'
-                                            ? 'bg-[#063B32] text-[#C9A24B] shadow-sm'
-                                            : 'text-gray-600 hover:text-[#061C2B]'
-                                    }`}
+                                    className={`flex-1 sm:flex-none px-3 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition cursor-pointer ${residency === 'Non-Resident'
+                                        ? 'bg-[#063B32] text-[#C9A24B] shadow-sm'
+                                        : 'text-gray-600 hover:text-[#061C2B]'
+                                        }`}
                                 >
                                     Non-Resident (Intl)
                                 </button>
@@ -512,11 +511,10 @@ export default function AvailabilityPage() {
                                     type="button"
                                     onClick={() => setResidency('Resident')}
                                     aria-pressed={residency === 'Resident'}
-                                    className={`flex-1 sm:flex-none px-3 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition cursor-pointer ${
-                                        residency === 'Resident'
-                                            ? 'bg-[#063B32] text-[#C9A24B] shadow-sm'
-                                            : 'text-gray-600 hover:text-[#061C2B]'
-                                    }`}
+                                    className={`flex-1 sm:flex-none px-3 sm:px-3.5 py-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition cursor-pointer ${residency === 'Resident'
+                                        ? 'bg-[#063B32] text-[#C9A24B] shadow-sm'
+                                        : 'text-gray-600 hover:text-[#061C2B]'
+                                        }`}
                                 >
                                     Sri Lankan (NIC)
                                 </button>
@@ -833,11 +831,10 @@ export default function AvailabilityPage() {
                                         type="button"
                                         onClick={() => setSelectedType(type)}
                                         aria-pressed={selectedType === type}
-                                        className={`px-3.5 py-1.5 rounded-full text-[11px] font-bold transition cursor-pointer ${
-                                            selectedType === type
-                                                ? 'bg-[#063B32] text-[#C9A24B]'
-                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                        }`}
+                                        className={`px-3.5 py-1.5 rounded-full text-[11px] font-bold transition cursor-pointer ${selectedType === type
+                                            ? 'bg-[#063B32] text-[#C9A24B]'
+                                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                            }`}
                                     >
                                         {type === 'ALL' ? 'All Suites' : type}
                                     </button>
@@ -858,12 +855,12 @@ export default function AvailabilityPage() {
                                 {loading
                                     ? 'Checking real-time room inventory...'
                                     : isExclusiveRoomOffer
-                                    ? availableRoomsCount > 0
-                                        ? `Exclusive Offer Suite Available for Your Dates`
-                                        : `Exclusive Offer Suite Unavailable for Selected Dates`
-                                    : activeOffer
-                                    ? `${availableRoomsCount} of ${offerEligibleRooms.length} Offer-Eligible Suites Available`
-                                    : `${availableRoomsCount} of ${filteredRooms.length} Room Categories Available for Your Dates`}
+                                        ? availableRoomsCount > 0
+                                            ? `Exclusive Offer Suite Available for Your Dates`
+                                            : `Exclusive Offer Suite Unavailable for Selected Dates`
+                                        : activeOffer
+                                            ? `${availableRoomsCount} of ${offerEligibleRooms.length} Offer-Eligible Suites Available`
+                                            : `${availableRoomsCount} of ${filteredRooms.length} Room Categories Available for Your Dates`}
                             </h2>
                             <p className="text-[11px] text-gray-300 font-light">
                                 {isExclusiveRoomOffer
@@ -871,8 +868,8 @@ export default function AvailabilityPage() {
                                         ? `${activeOffer.discount || 'Special rate'} locked in for ${nights} ${nights === 1 ? 'night' : 'nights'} · Verified ${lastChecked ? `at ${lastChecked}` : 'live'}`
                                         : 'Try adjusting your check-in / check-out dates above or view other suites below.'
                                     : activeOffer
-                                    ? `Select any suite below to reserve with ${activeOffer.discount || 'your special offer'} auto-applied ${lastChecked ? `· Verified at ${lastChecked}` : ''}`
-                                    : `Live inventory verified against current hotel reservations ${lastChecked ? `at ${lastChecked}` : ''}`}
+                                        ? `Select any suite below to reserve with ${activeOffer.discount || 'your special offer'} auto-applied ${lastChecked ? `· Verified at ${lastChecked}` : ''}`
+                                        : `Live inventory verified against current hotel reservations ${lastChecked ? `at ${lastChecked}` : ''}`}
                             </p>
                         </div>
                     </div>
@@ -965,24 +962,23 @@ export default function AvailabilityPage() {
                                 const strikeRate = offerPricing.isOfferApplied
                                     ? offerPricing.preOfferNightlyRate
                                     : isResident && regularRate > activeRate
-                                    ? regularRate
-                                    : null;
+                                        ? regularRate
+                                        : null;
 
                                 return (
                                     <article
                                         key={`${isHighlighted ? 'selected-' : ''}${room.id}`}
-                                        className={`bg-white rounded-3xl overflow-hidden shadow-md border transition-all duration-300 grid grid-cols-1 lg:grid-cols-12 ${
-                                            isHighlighted
-                                                ? 'border-2 border-[#C9A24B] shadow-2xl ring-4 ring-[#C9A24B]/15'
-                                                : isAvailable
+                                        className={`bg-white rounded-3xl overflow-hidden shadow-md border transition-all duration-300 grid grid-cols-1 lg:grid-cols-12 ${isHighlighted
+                                            ? 'border-2 border-[#C9A24B] shadow-2xl ring-4 ring-[#C9A24B]/15'
+                                            : isAvailable
                                                 ? 'border-[#C9A24B]/35 hover:shadow-xl'
                                                 : 'border-gray-200 opacity-85'
-                                        }`}
+                                            }`}
                                     >
                                         {/* Room Image Column (4 Cols) */}
                                         <div className="lg:col-span-4 relative min-h-[220px] sm:min-h-[250px] bg-gray-100">
                                             <img
-                                                src={room.images?.[0] || roomsHeroImg}
+                                                src={room.images?.[0] || availabilityPageHero}
                                                 alt={`${room.title} luxury accommodation at Serenity Bay Resort`}
                                                 loading="lazy"
                                                 className="w-full h-full object-cover"
@@ -991,8 +987,8 @@ export default function AvailabilityPage() {
                                                 {isHighlighted && activeOffer && isOfferEligible
                                                     ? 'OFFER ELIGIBLE SUITE'
                                                     : isHighlighted
-                                                    ? 'YOUR SELECTED SUITE'
-                                                    : room.room_type}
+                                                        ? 'YOUR SELECTED SUITE'
+                                                        : room.room_type}
                                             </span>
 
                                             {/* Special Offer Discount Pill on Image */}
@@ -1004,13 +1000,12 @@ export default function AvailabilityPage() {
 
                                             {/* Live Inventory Status Pill */}
                                             <span
-                                                className={`absolute bottom-4 left-4 px-3.5 py-1.5 rounded-full text-xs font-extrabold shadow-md flex items-center gap-1.5 ${
-                                                    !isAvailable
-                                                        ? 'bg-red-600 text-white'
-                                                        : isLowStock
+                                                className={`absolute bottom-4 left-4 px-3.5 py-1.5 rounded-full text-xs font-extrabold shadow-md flex items-center gap-1.5 ${!isAvailable
+                                                    ? 'bg-red-600 text-white'
+                                                    : isLowStock
                                                         ? 'bg-[#C9A24B] text-[#061C2B]'
                                                         : 'bg-[#063B32] text-white'
-                                                }`}
+                                                    }`}
                                             >
                                                 {isAvailable ? (
                                                     <>
@@ -1104,8 +1099,8 @@ export default function AvailabilityPage() {
                                                         {offerPricing.isOfferApplied
                                                             ? 'Special Offer Rate'
                                                             : isResident
-                                                            ? 'Sri Lankan Resident Rate'
-                                                            : 'Non-Resident Rate'}
+                                                                ? 'Sri Lankan Resident Rate'
+                                                                : 'Non-Resident Rate'}
                                                     </span>
                                                     {isResident && (
                                                         <span className="text-[10px] font-bold bg-[#063B32] text-[#C9A24B] px-2 py-0.5 rounded-full">
@@ -1161,8 +1156,8 @@ export default function AvailabilityPage() {
                                                             {roomChildPolicy.olderChildCount > 0
                                                                 ? 'Kids Stay Free in this Suite (Complimentary Extra Bed)'
                                                                 : roomChildPolicy.infantCount > 0
-                                                                ? 'Infant stays free · Baby cot available'
-                                                                : 'Child stays free (sharing bedding)'}
+                                                                    ? 'Infant stays free · Baby cot available'
+                                                                    : 'Child stays free (sharing bedding)'}
                                                         </span>
                                                     )}
                                                     {roomPromoDiscount > 0 && (
@@ -1239,8 +1234,8 @@ export default function AvailabilityPage() {
                                                     {isExclusiveRoomOffer
                                                         ? `Included Offer Suite — ${selectedRoomItem.title}`
                                                         : activeOffer && isRoomEligibleForOffer(selectedRoomItem, activeOffer)
-                                                        ? `Featured Offer Suite — ${activeOffer.title}`
-                                                        : 'Your Selected Room'}
+                                                            ? `Featured Offer Suite — ${activeOffer.title}`
+                                                            : 'Your Selected Room'}
                                                 </h3>
                                                 <span className="text-xs text-gray-500">
                                                     {selectedRoomItem.is_available

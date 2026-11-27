@@ -17,10 +17,10 @@ import { applyPageSEO } from '../utils/seo';
 
 // Existing project assets — swap any of these imports with your own photography later
 import hotelLobbyImg from '../assets/hotelLobbyImg.webp';
-import resortExteriorImg from '../assets/experience-bg.webp';
+import resortExteriorImg from '../assets/resortExteriorImg.webp';
 import luxurySuiteImg from '../assets/roomsPageHero.webp';
 import fineDiningImg from '../assets/OffersPageHero.webp';
-import spaWellnessImg from '../assets/homeHero.webp';
+import spaWellnessImg from '../assets/spaWellnessImg.webp';
 
 // Key resort highlights displayed in the editorial metrics bar
 const RESORT_HIGHLIGHTS = [

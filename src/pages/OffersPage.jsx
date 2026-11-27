@@ -19,7 +19,7 @@ import {
 import RoomsBanner from '../components/RoomsBanner';
 
 // Import the hero background image asset
-import offersHeroImg from '../assets/OffersPageHero.webp';
+import offersPageHero from '../assets/OffersPageHero.webp';
 
 /**
  * OffersPage Component
@@ -110,7 +110,7 @@ function OffersPage() {
             <header
                 className="relative h-[450px] md:h-[600px] bg-cover bg-center flex flex-col justify-center px-6 pt-20 md:px-12 md:pt-28"
                 style={{
-                    backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${offersHeroImg})`
+                    backgroundImage: `linear-gradient(to right, rgba(6, 59, 50, 0.85) 0%, rgba(6, 59, 50, 0.45) 40%, rgba(6, 59, 50, 0.1) 70%, rgba(6, 59, 50, 0) 90%), url(${offersPageHero})`
                 }}
                 role="banner"
                 aria-label="Offers page header"

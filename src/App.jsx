@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import RoomsPage from './pages/RoomsPage';
 import RoomDetailsPage from './pages/RoomDetailsPage';
@@ -13,12 +13,22 @@ import MyBookingsPage from './pages/MyBookingsPage';
 import AuthPage from './pages/AuthPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
+import ReviewsPage from './pages/ReviewsPage';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
 
 function AppLayout() {
   return (
     <div className="w-full bg-[#F2EFE9] min-h-screen text-gray-800">
+      <ScrollToTop />
       {/* Global Navigation Bar */}
       <Navbar />
 
@@ -62,6 +72,9 @@ function AppLayout() {
 
         {/* Contact & Concierge Page Route */}
         <Route path="/contact" element={<ContactPage />} />
+
+        {/* Verified Guest Reviews Page Route */}
+        <Route path="/reviews" element={<ReviewsPage />} />
       </Routes>
 
       {/* Global Footer */}

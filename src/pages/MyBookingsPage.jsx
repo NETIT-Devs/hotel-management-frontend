@@ -19,8 +19,10 @@ import {
   CreditCard,
   Sparkles,
   LogIn,
+  Star,
 } from 'lucide-react';
 import checkoutHeroImg from '../assets/checkoutPageHero.webp';
+import ReviewModal from '../components/ReviewModal';
 import {
   fetchMyFacilityReservations,
   cancelMyFacilityReservation,
@@ -39,6 +41,11 @@ const STATUS_META = {
   APPROVED: {
     label: 'Confirmed',
     badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+    icon: CheckCircle2,
+  },
+  CHECKED_OUT: {
+    label: 'Completed Stay',
+    badgeClass: 'bg-sky-100 text-sky-800 border-sky-200',
     icon: CheckCircle2,
   },
   REJECTED: {
@@ -105,6 +112,9 @@ export default function MyBookingsPage() {
   // Cancel confirmation state
   const [cancelTarget, setCancelTarget] = useState(null);
   const [cancelling, setCancelling] = useState(false);
+
+  // Verified Stay Review Modal target booking
+  const [reviewTarget, setReviewTarget] = useState(null);
 
   // Customer facility reservations & event inquiries state
   const [facilityReservations, setFacilityReservations] = useState([]);
@@ -505,6 +515,12 @@ export default function MyBookingsPage() {
                 const StatusIcon = meta.icon;
                 const nights = calcNights(b.check_in, b.check_out);
                 const canCancel = token && (b.status === 'PENDING' || b.status === 'APPROVED');
+                const todayIso = new Date().toISOString().slice(0, 10);
+                const checkOutIso = String(b.check_out || '').slice(0, 10);
+                const isStayCompleted =
+                  b.status === 'CHECKED_OUT' ||
+                  (b.status === 'APPROVED' && Boolean(checkOutIso) && checkOutIso <= todayIso);
+                const hasReview = Boolean(b.review_id);
 
                 return (
                   <article
@@ -607,6 +623,26 @@ export default function MyBookingsPage() {
                           <FileText className="w-3.5 h-3.5" />
                           <span>View Receipt &amp; Details</span>
                         </button>
+
+                        {isStayCompleted && !hasReview && (
+                          <button
+                            type="button"
+                            onClick={() => setReviewTarget(b)}
+                            className="w-full bg-gradient-to-r from-[#C9A24B] to-[#b49147] text-[#061C2B] py-2.5 px-4 rounded-xl text-xs font-extrabold uppercase tracking-wider hover:opacity-95 transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                          >
+                            <Star className="w-3.5 h-3.5 fill-[#061C2B]" />
+                            <span>Leave a Review</span>
+                          </button>
+                        )}
+
+                        {hasReview && (
+                          <div className="w-full bg-emerald-50 text-emerald-800 border border-emerald-200 py-2 px-4 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>
+                              Reviewed{b.review_status === 'PENDING' ? ' (Pending Approval)' : ''}
+                            </span>
+                          </div>
+                        )}
 
                         {canCancel && (
                           <button
@@ -922,6 +958,22 @@ export default function MyBookingsPage() {
           }
         }
       `}</style>
+      {/* Verified Stay Review Modal */}
+      <ReviewModal
+        isOpen={Boolean(reviewTarget)}
+        onClose={() => setReviewTarget(null)}
+        initialBooking={reviewTarget}
+        guestEmail={lookupEmail || user?.email || ''}
+        onSuccess={(bookingId) => {
+          setBookings((prev) =>
+            prev.map((item) =>
+              item.id === bookingId
+                ? { ...item, review_id: Date.now(), review_status: 'PENDING' }
+                : item
+            )
+          );
+        }}
+      />
     </main>
   );
 }

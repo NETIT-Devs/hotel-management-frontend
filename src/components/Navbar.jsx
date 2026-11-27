@@ -12,6 +12,7 @@ const resolveNavPath = (link) => {
         Facilities: '/facilities',
         Offers: '/offers',
         Gallery: '/gallery',
+        Reviews: '/reviews',
         'About Us': '/about',
         Contact: '/contact',
     };
